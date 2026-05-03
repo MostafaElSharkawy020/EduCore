@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — EduArc</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.welcome-banner {
+  background: linear-gradient(135deg, var(--primary) 0%, #2d3566 100%);
+  border-radius: 16px; padding: 32px 36px; color: white;
+  position: relative; overflow: hidden; margin-bottom: 28px;
+}
+.welcome-banner::after {
+  content:''; position:absolute; right:-40px; top:-40px;
+  width:200px; height:200px; border-radius:50%;
+  background:rgba(255,255,255,.05);
+}
+.welcome-banner::before {
+  content:''; position:absolute; right:80px; bottom:-60px;
+  width:150px; height:150px; border-radius:50%;
+  background:rgba(232,160,69,.1);
+}
+.welcome-sub { color:rgba(255,255,255,.65); margin-top:6px; font-size:.95rem; }
+.course-progress { margin-top:16px; }
+.inline-progress {
+  display:flex; align-items:center; gap:12px;
+  font-size:.85rem; color:rgba(255,255,255,.75);
+}
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main-content">
+<div class="page-inner">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner" id="welcome-banner">
+    <div class="topnav-role" style="color:rgba(255,255,255,.5);margin-bottom:8px">DASHBOARD</div>
+    <h1 id="welcome-msg" style="font-size:1.8rem;color:white">Good morning, Alex 👋</h1>
+    <p class="welcome-sub" id="welcome-sub">You have 3 courses in progress. Keep going!</p>
+    <div class="course-progress" id="student-progress" style="margin-top:20px">
+      <div class="inline-progress">
+        <span>Overall Progress</span>
+        <div style="flex:1;max-width:200px">
+          <div class="progress-bar" style="background:rgba(255,255,255,.2)">
+            <div class="progress-fill" style="width:62%;background:var(--accent)"></div>
+          </div>
+        </div>
+        <span style="font-weight:700;color:var(--accent)">62%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="grid-4" id="stats-row" style="margin-bottom:28px">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#eff3ff">📚</div>
+      <div class="stat-value" id="stat-courses">3</div>
+      <div class="stat-label" id="stat-courses-label">Enrolled Courses</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fef3e2">⏱</div>
+      <div class="stat-value">14h</div>
+      <div class="stat-label" id="stat-label2">Study Time</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#f0fdf4">✅</div>
+      <div class="stat-value" id="stat-complete">2</div>
+      <div class="stat-label" id="stat-complete-label">Exams Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fff0f0">🏆</div>
+      <div class="stat-value">A-</div>
+      <div class="stat-label">Average Grade</div>
+    </div>
+  </div>
+
+  <!-- My Courses -->
+  <div class="flex-between mb-16">
+    <h2 style="font-size:1.25rem">My Courses</h2>
+    <a href="all-courses.html" class="btn btn-outline btn-sm" id="cta-link">Browse More</a>
+  </div>
+
+  <div class="grid-3" id="courses-grid">
+    <!-- injected by JS -->
+  </div>
+
+  <!-- Recent Activity (teacher/assistant) -->
+  <div id="activity-section" style="display:none;margin-top:32px">
+    <h2 style="font-size:1.25rem;margin-bottom:16px">Recent Activity</h2>
+    <div class="card">
+      <div class="table-wrap" style="border:none">
+        <table>
+          <thead>
+            <tr><th>Action</th><th>Item</th><th>Date</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Course Updated</td><td>Advanced Mathematics</td><td>May 2, 2026</td><td><span class="badge badge-green">Done</span></td></tr>
+            <tr><td>Class Added</td><td>Calculus — Week 5</td><td>May 1, 2026</td><td><span class="badge badge-blue">Active</span></td></tr>
+            <tr><td>Exam Published</td><td>Mid-term Exam</td><td>Apr 30, 2026</td><td><span class="badge badge-accent">Live</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<script src="shared.js"></script>
+<script>
+const DEMO_COURSES = {
+  student: [
+    { id:1, title:'Advanced Mathematics', teacher:'Prof. Sarah Mitchell', progress:78, classes:12, price:49, thumb:'#4f6ef7' },
+    { id:2, title:'Introduction to Physics', teacher:'Dr. Alan Park', progress:45, classes:8, price:39, thumb:'#e8a045' },
+    { id:3, title:'English Literature', teacher:'Prof. Jane Doe', progress:60, classes:10, price:29, thumb:'#22c55e' },
+  ],
+  teacher: [
+    { id:1, title:'Advanced Mathematics', students:34, classes:12, price:49, enrollable:true, thumb:'#4f6ef7' },
+    { id:2, title:'Calculus II', students:21, classes:9, price:59, enrollable:true, thumb:'#e8a045' },
+  ],
+  assistant: [
+    { id:1, title:'Advanced Mathematics', teacher:'Prof. Sarah Mitchell', students:34, classes:12, thumb:'#4f6ef7' },
+  ]
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(sessionStorage.getItem('cms_user') || '{"fname":"Alex","lname":"Johnson","role":"student"}');
+  const role = user.role || 'student';
+
+  // Welcome msg
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('welcome-msg').textContent = `${greet}, ${user.fname} 👋`;
+
+  if (role === 'teacher') {
+    document.getElementById('welcome-sub').textContent = 'Manage your courses and track student progress.';
+    document.getElementById('student-progress').style.display = 'none';
+    document.getElementById('stat-courses-label').textContent = 'Active Courses';
+    document.getElementById('stat-label2').textContent = 'Total Students';
+    document.getElementById('stat-complete').textContent = '5';
+    document.getElementById('stat-complete-label').textContent = 'Exams Published';
+    document.getElementById('cta-link').textContent = '+ New Course';
+    document.getElementById('cta-link').href = 'editor-course.html';
+    document.getElementById('activity-section').style.display = 'block';
+  } else if (role === 'assistant') {
+    document.getElementById('welcome-sub').textContent = 'You are assisting with assigned courses.';
+    document.getElementById('student-progress').style.display = 'none';
+    document.getElementById('activity-section').style.display = 'block';
+    document.getElementById('cta-link').style.display = 'none';
+  }
+
+  const courses = DEMO_COURSES[role] || DEMO_COURSES.student;
+  const grid = document.getElementById('courses-grid');
+  grid.innerHTML = courses.map(c => renderCourseCard(c, role)).join('');
+});
+
+function renderCourseCard(c, role) {
+  if (role === 'student') {
+    return `<a href="course-details.html?id=${c.id}" class="course-card">
+      <div class="course-card-img" style="background:linear-gradient(135deg,${c.thumb},var(--primary))">
+        <svg width="48" height="48" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </div>
+      <div class="course-card-body">
+        <div class="course-card-title">${c.title}</div>
+        <div class="course-card-meta" style="margin-bottom:12px">${c.teacher}</div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:4px">Progress</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${c.progress}%"></div></div>
+        <div style="font-size:.78rem;color:var(--accent2);margin-top:4px;font-weight:600">${c.progress}% complete</div>
+      </div>
+    </a>`;
+  } else {
+    return `<a href="course-management.html" class="course-card">
+      <div class="course-card-img" style="background:linear-gradient(135deg,${c.thumb},var(--primary))">
+        <svg width="48" height="48" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </div>
+      <div class="course-card-body">
+        <div class="course-card-title">${c.title}</div>
+        <div class="course-card-meta">${c.teacher ? 'Lead: '+c.teacher : (c.enrollable ? '<span class="badge badge-green">Open</span>' : '<span class="badge badge-accent">Closed</span>')}</div>
+        <div style="margin-top:10px;font-size:.82rem;color:var(--text-muted)">${c.students} students · ${c.classes} classes</div>
+      </div>
+    </a>`;
+  }
+}
+</script>
+</body>
+</html>

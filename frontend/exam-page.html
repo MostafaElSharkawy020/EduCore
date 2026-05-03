@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exam — EduArc</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.exam-top {
+  background: var(--primary); border-radius: 14px;
+  padding: 20px 28px; display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 24px; color: white;
+}
+.timer-display {
+  font-size: 1.6rem; font-weight: 700; font-family: 'Playfair Display',serif;
+  color: var(--accent);
+}
+.timer-display.warning { color: #ef4444; animation: blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.5} }
+.question-counter {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.q-dot {
+  width: 30px; height: 30px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700; cursor: pointer;
+  border: 1.5px solid var(--border); background: var(--surface2);
+  color: var(--text-muted); transition: all .18s;
+}
+.q-dot.answered { background: var(--accent2); border-color: var(--accent2); color: white; }
+.q-dot.current { border-color: var(--primary); color: var(--primary); font-weight: 700; }
+.exam-layout { display: grid; grid-template-columns: 1fr 240px; gap: 20px; align-items: start; }
+@media(max-width:800px) { .exam-layout { grid-template-columns:1fr; } }
+.start-screen {
+  text-align: center; padding: 48px 20px;
+}
+.start-screen h2 { font-size: 1.8rem; margin-bottom: 12px; }
+.exam-screen { display: none; }
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main-content">
+<div class="page-inner">
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="card start-screen">
+    <div style="width:72px;height:72px;background:#eff3ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem">📝</div>
+    <h2 id="exam-title-start">Mid-term Exam</h2>
+    <p style="color:var(--text-muted);font-size:.95rem;max-width:480px;margin:0 auto 28px;line-height:1.7">
+      This exam covers topics from Weeks 1–6 of Advanced Mathematics. You have <strong>45 minutes</strong> to complete <strong>5 questions</strong>.
+    </p>
+    <div class="grid-4" style="max-width:600px;margin:0 auto 28px;gap:16px">
+      <div class="stat-card" style="text-align:center;padding:16px">
+        <div style="font-size:1.4rem;font-weight:700;font-family:'Playfair Display',serif">5</div>
+        <div style="font-size:.78rem;color:var(--text-muted)">Questions</div>
+      </div>
+      <div class="stat-card" style="text-align:center;padding:16px">
+        <div style="font-size:1.4rem;font-weight:700;font-family:'Playfair Display',serif">45</div>
+        <div style="font-size:.78rem;color:var(--text-muted)">Minutes</div>
+      </div>
+      <div class="stat-card" style="text-align:center;padding:16px">
+        <div style="font-size:1.4rem;font-weight:700;font-family:'Playfair Display',serif">MCQ</div>
+        <div style="font-size:.78rem;color:var(--text-muted)">Format</div>
+      </div>
+      <div class="stat-card" style="text-align:center;padding:16px">
+        <div style="font-size:1.4rem;font-weight:700;font-family:'Playfair Display',serif">60%</div>
+        <div style="font-size:.78rem;color:var(--text-muted)">Pass Mark</div>
+      </div>
+    </div>
+    <div class="alert alert-warning" style="max-width:480px;margin:0 auto 24px;text-align:left">
+      ⚠️ Once you start, the timer cannot be paused. Ensure you have a stable connection.
+    </div>
+    <button class="btn btn-accent" style="padding:14px 36px;font-size:1rem" onclick="startExam()">Begin Exam →</button>
+    <div style="margin-top:16px"><a href="course-details.html?id=1" style="color:var(--text-muted);font-size:.85rem;text-decoration:none">← Back to Course</a></div>
+  </div>
+
+  <!-- EXAM SCREEN -->
+  <div id="exam-screen" class="exam-screen">
+    <!-- Top Bar -->
+    <div class="exam-top">
+      <div>
+        <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.5);margin-bottom:2px" id="exam-type-label">Mid-term Exam</div>
+        <div style="font-weight:600">Advanced Mathematics</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:2px">TIME REMAINING</div>
+        <div class="timer-display" id="timer">45:00</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:2px">PROGRESS</div>
+        <div style="font-weight:600" id="q-progress">0 / 5</div>
+      </div>
+    </div>
+
+    <div class="exam-layout">
+      <!-- Questions -->
+      <div>
+        <div id="questions-wrapper">
+          <!-- injected -->
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:20px">
+          <button class="btn btn-outline" id="prev-btn" onclick="changeQ(-1)" disabled>← Previous</button>
+          <button class="btn btn-primary" id="next-btn" onclick="changeQ(1)">Next →</button>
+          <button class="btn btn-accent" id="submit-btn" onclick="submitExam()" style="display:none">Submit Exam</button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="card" style="padding:18px">
+        <h3 style="font-size:.9rem;font-weight:700;margin-bottom:12px">Question Navigator</h3>
+        <div class="question-counter" id="q-dots">
+          <!-- injected -->
+        </div>
+        <hr class="divider">
+        <div style="font-size:.8rem;color:var(--text-muted);line-height:1.8">
+          <div><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--accent2);margin-right:6px"></span>Answered</div>
+          <div><span style="display:inline-block;width:12px;height:12px;border-radius:3px;border:1.5px solid var(--primary);margin-right:6px"></span>Current</div>
+          <div><span style="display:inline-block;width:12px;height:12px;border-radius:3px;border:1.5px solid var(--border);margin-right:6px"></span>Not answered</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen" style="display:none" class="card" style="text-align:center;padding:48px">
+    <div style="text-align:center;padding:20px">
+      <div style="font-size:3rem;margin-bottom:16px" id="result-emoji">🎉</div>
+      <h2 style="font-size:1.8rem;margin-bottom:8px" id="result-title">Exam Complete!</h2>
+      <div style="font-size:3rem;font-weight:700;font-family:'Playfair Display',serif;color:var(--accent2);margin:16px 0" id="result-score">4/5</div>
+      <p style="color:var(--text-muted);margin-bottom:28px" id="result-msg">Great job! You passed the exam.</p>
+      <div class="grid-2" style="max-width:400px;margin:0 auto 28px">
+        <div class="stat-card" style="text-align:center">
+          <div style="font-size:1.4rem;font-weight:700;font-family:'Playfair Display',serif" id="result-correct">4</div>
+          <div style="font-size:.78rem;color:var(--text-muted)">Correct</div>
+        </div>
+        <div class="stat-card" style="text-align:center">
+          <div style="font-size:1.4rem;font-weight:700;font-family:'Playfair Display',serif" id="result-pct">80%</div>
+          <div style="font-size:.78rem;color:var(--text-muted)">Score</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <a href="course-details.html?id=1" class="btn btn-primary">Back to Course</a>
+        <a href="my-courses.html" class="btn btn-outline">Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<script src="shared.js"></script>
+<script>
+const QUESTIONS = [
+  { id:1, text:'What is the derivative of f(x) = x³?', choices:['x²','3x²','3x³','x³'], correct:1 },
+  { id:2, text:'The integral of 1/x is:', choices:['x⁻²','ln|x| + C','1/x² + C','e^x + C'], correct:1 },
+  { id:3, text:'What rule is used when differentiating a product of two functions?', choices:['Chain Rule','Power Rule','Product Rule','Quotient Rule'], correct:2 },
+  { id:4, text:'lim(x→0) sin(x)/x equals:', choices:['0','∞','1','Undefined'], correct:2 },
+  { id:5, text:'What is the second derivative of f(x) = 4x³ + 2x?', choices:['12x + 2','12x² + 2','24x','12x'], correct:2 },
+];
+
+let currentQ = 0;
+let answers = {};
+let timerSecs = 45 * 60;
+let timerInterval;
+
+function startExam() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('exam-screen').style.display = 'block';
+  renderQuestion(0);
+  renderDots();
+  startTimer();
+}
+
+function renderQuestion(idx) {
+  const q = QUESTIONS[idx];
+  const wrapper = document.getElementById('questions-wrapper');
+  wrapper.innerHTML = `
+    <div class="question-card">
+      <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Question ${idx+1} of ${QUESTIONS.length}</div>
+      <div class="progress-bar" style="margin-bottom:16px">
+        <div class="progress-fill" style="width:${((idx+1)/QUESTIONS.length)*100}%"></div>
+      </div>
+      <p style="font-weight:600;font-size:1.05rem;margin-bottom:18px">${q.text}</p>
+      ${q.choices.map((c,i) => `
+        <div class="choice-item ${answers[idx]===i?'selected':''}" onclick="selectAnswer(${i})">
+          <span style="width:24px;height:24px;border-radius:50%;border:2px solid ${answers[idx]===i?'var(--accent2)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;background:${answers[idx]===i?'var(--accent2)':''};color:${answers[idx]===i?'white':'var(--text-muted)'}">${String.fromCharCode(65+i)}</span>
+          ${c}
+        </div>
+      `).join('')}
+    </div>
+  `;
+  // Update buttons
+  document.getElementById('prev-btn').disabled = idx === 0;
+  document.getElementById('next-btn').style.display = idx < QUESTIONS.length - 1 ? 'inline-flex' : 'none';
+  document.getElementById('submit-btn').style.display = idx === QUESTIONS.length - 1 ? 'inline-flex' : 'none';
+  document.getElementById('q-progress').textContent = `${Object.keys(answers).length} / ${QUESTIONS.length}`;
+  renderDots();
+}
+
+function selectAnswer(i) {
+  answers[currentQ] = i;
+  renderQuestion(currentQ);
+}
+
+function changeQ(dir) {
+  currentQ = Math.max(0, Math.min(QUESTIONS.length - 1, currentQ + dir));
+  renderQuestion(currentQ);
+}
+
+function renderDots() {
+  const dots = document.getElementById('q-dots');
+  dots.innerHTML = QUESTIONS.map((q,i) => `
+    <div class="q-dot ${answers[i]!==undefined?'answered':''} ${i===currentQ?'current':''}" onclick="jumpQ(${i})">${i+1}</div>
+  `).join('');
+}
+
+function jumpQ(i) {
+  currentQ = i;
+  renderQuestion(i);
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timerSecs--;
+    const m = String(Math.floor(timerSecs/60)).padStart(2,'0');
+    const s = String(timerSecs%60).padStart(2,'0');
+    const el = document.getElementById('timer');
+    el.textContent = `${m}:${s}`;
+    if (timerSecs <= 300) el.classList.add('warning');
+    if (timerSecs <= 0) { clearInterval(timerInterval); submitExam(); }
+  }, 1000);
+}
+
+function submitExam() {
+  clearInterval(timerInterval);
+  const correct = QUESTIONS.filter((q,i) => answers[i] === q.correct).length;
+  const pct = Math.round((correct/QUESTIONS.length)*100);
+  const passed = pct >= 60;
+  document.getElementById('exam-screen').style.display = 'none';
+  document.getElementById('results-screen').style.display = 'block';
+  document.getElementById('result-emoji').textContent = passed ? '🎉' : '📚';
+  document.getElementById('result-title').textContent = passed ? 'Exam Complete!' : 'Better luck next time';
+  document.getElementById('result-score').textContent = `${correct}/${QUESTIONS.length}`;
+  document.getElementById('result-correct').textContent = correct;
+  document.getElementById('result-pct').textContent = `${pct}%`;
+  document.getElementById('result-msg').textContent = passed ? 'Congratulations! You passed the exam.' : `You scored ${pct}%. You need 60% to pass.`;
+}
+</script>
+</body>
+</html>

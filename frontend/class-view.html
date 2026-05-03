@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class View — EduArc</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.class-layout { display:grid; grid-template-columns:1fr 300px; gap:24px; }
+@media(max-width:900px){ .class-layout { grid-template-columns:1fr; } }
+.video-placeholder {
+  width:100%; aspect-ratio:16/9; background:var(--primary);
+  border-radius:var(--radius); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; color:rgba(255,255,255,.5);
+  cursor:pointer; position:relative; overflow:hidden;
+}
+.play-btn {
+  width:64px; height:64px; background:rgba(255,255,255,.15);
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(4px); cursor:pointer; transition:all .2s;
+  border:2px solid rgba(255,255,255,.2);
+}
+.play-btn:hover { background:var(--accent); border-color:var(--accent); transform:scale(1.05); }
+.class-nav-item {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 12px; border-radius:8px; cursor:pointer;
+  transition:all .18s; margin-bottom:4px; text-decoration:none; color:var(--text);
+}
+.class-nav-item:hover { background:var(--surface); }
+.class-nav-item.active { background:#eff3ff; color:var(--accent2); }
+.class-num-sm { width:28px; height:28px; border-radius:6px; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; flex-shrink:0; }
+.active .class-num-sm { background:var(--accent2); color:white; }
+.resources-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.resource-card {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px; border-radius:10px; border:1.5px solid var(--border);
+  background:var(--surface2); cursor:pointer; text-decoration:none; color:var(--text);
+  font-size:.88rem; font-weight:500; transition:all .18s;
+}
+.resource-card:hover { border-color:var(--accent2); background:#eff3ff; color:var(--accent2); }
+.quiz-section { margin-top:28px; }
+.quiz-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.quiz-timer { background:var(--surface); padding:6px 14px; border-radius:100px; font-size:.85rem; font-weight:600; }
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main-content">
+<div class="page-inner">
+
+  <!-- Breadcrumb -->
+  <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:14px">
+    <a href="my-courses.html" style="color:var(--accent2);text-decoration:none">Dashboard</a>
+    <span style="margin:0 8px">›</span>
+    <a href="course-details.html?id=1" style="color:var(--accent2);text-decoration:none">Advanced Mathematics</a>
+    <span style="margin:0 8px">›</span>
+    <span>Class 1: Introduction & Limits</span>
+  </nav>
+
+  <div class="class-layout">
+    <!-- MAIN CONTENT -->
+    <div>
+      <!-- Video Player -->
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:20px">
+        <div class="video-placeholder" id="video-area" onclick="playVideo()">
+          <!-- Fake video gradient background -->
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a1f36,#2d3566)"></div>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div class="play-btn" id="play-btn">
+              <svg width="22" height="22" fill="white" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <p style="margin-top:16px;font-size:.9rem;color:rgba(255,255,255,.6)">Click to play lecture video</p>
+          </div>
+          <!-- Fake progress bar at bottom -->
+          <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(255,255,255,.1)">
+            <div style="width:0%;height:100%;background:var(--accent);transition:width .3s" id="vid-progress"></div>
+          </div>
+          <!-- Time indicator -->
+          <div style="position:absolute;bottom:12px;right:12px;font-size:.75rem;color:rgba(255,255,255,.5)" id="vid-time">00:00 / 18:42</div>
+        </div>
+        <div style="padding:20px 24px">
+          <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:6px" id="class-title">Class 1: Introduction & Limits</h2>
+          <p style="font-size:.88rem;color:var(--text-muted)" id="class-desc">
+            In this class we introduce the fundamental concept of limits, exploring how functions behave as they approach particular values. We cover epsilon-delta definitions and intuitive approaches.
+          </p>
+        </div>
+      </div>
+
+      <!-- Resources -->
+      <div class="card" style="margin-bottom:20px">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:4px">Class Resources</h3>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px">Download materials for this class</p>
+        <div class="resources-row">
+          <a href="#" class="resource-card" onclick="event.preventDefault();showToast('Downloading lecture notes...')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Lecture Notes PDF
+          </a>
+          <a href="#" class="resource-card" onclick="event.preventDefault();showToast('Downloading homework...')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Homework PDF
+          </a>
+          <a href="#" class="resource-card" onclick="event.preventDefault();showToast('Opening slides...')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Lecture Slides
+          </a>
+        </div>
+      </div>
+
+      <!-- Quiz Section -->
+      <div class="quiz-section">
+        <div class="quiz-header">
+          <h3 style="font-size:1.1rem;font-weight:700">Class Quiz</h3>
+          <div class="quiz-timer" id="quiz-timer">5:00</div>
+        </div>
+        <div id="quiz-container">
+          <!-- Q1 -->
+          <div class="question-card">
+            <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px">Question 1 of 3</div>
+            <p style="font-weight:600;margin-bottom:14px">What does the notation lim(x→a) f(x) = L mean?</p>
+            <div onclick="selectChoice(this,true)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">A</span> As x approaches a, f(x) approaches L</div>
+            <div onclick="selectChoice(this,false)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">B</span> f(a) equals L</div>
+            <div onclick="selectChoice(this,false)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">C</span> x can never equal a</div>
+            <div onclick="selectChoice(this,false)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">D</span> f(x) is undefined at a</div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="question-card">
+            <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px">Question 2 of 3</div>
+            <p style="font-weight:600;margin-bottom:14px">What is lim(x→2) (x² - 4)/(x - 2)?</p>
+            <div onclick="selectChoice(this,false)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">A</span> 0</div>
+            <div onclick="selectChoice(this,false)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">B</span> Undefined</div>
+            <div onclick="selectChoice(this,true)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">C</span> 4</div>
+            <div onclick="selectChoice(this,false)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">D</span> 2</div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="question-card">
+            <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px">Question 3 of 3</div>
+            <p style="font-weight:600;margin-bottom:14px">A function f(x) is continuous at x = a if:</p>
+            <div onclick="selectChoice(this,false)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">A</span> f(a) exists only</div>
+            <div onclick="selectChoice(this,false)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">B</span> The limit exists only</div>
+            <div onclick="selectChoice(this,true)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">C</span> f(a) exists, the limit exists, and they're equal</div>
+            <div onclick="selectChoice(this,false)" class="choice-item"><span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0">D</span> f(x) is defined everywhere</div>
+          </div>
+
+          <button class="btn btn-primary" onclick="submitQuiz()" id="submit-quiz-btn">Submit Quiz</button>
+        </div>
+
+        <div id="quiz-result" style="display:none" class="card">
+          <h3 style="font-size:1.1rem;margin-bottom:8px">Quiz Complete!</h3>
+          <div style="font-size:2rem;font-weight:700;font-family:'Playfair Display',serif;color:var(--accent2)" id="quiz-score">3 / 3</div>
+          <p style="color:var(--text-muted);font-size:.9rem;margin-top:4px">Well done! You've mastered this class's material.</p>
+          <div style="margin-top:16px;display:flex;gap:12px">
+            <a href="class-view.html?id=2" class="btn btn-primary">Next Class →</a>
+            <button class="btn btn-outline" onclick="resetQuiz()">Retry Quiz</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR: Class List -->
+    <div>
+      <div class="card" style="padding:16px">
+        <h3 style="font-size:.95rem;font-weight:700;margin-bottom:14px">Course Classes</h3>
+        <a href="class-view.html?id=1" class="class-nav-item active">
+          <div class="class-num-sm">1</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Intro & Limits</div>
+            <div style="font-size:.72rem;color:var(--text-muted)">18:42 · Done</div>
+          </div>
+        </a>
+        <a href="class-view.html?id=2" class="class-nav-item">
+          <div class="class-num-sm">2</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Derivatives I</div>
+            <div style="font-size:.72rem;color:var(--text-muted)">22:10 · In progress</div>
+          </div>
+        </a>
+        <a href="class-view.html?id=3" class="class-nav-item">
+          <div class="class-num-sm">3</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Derivatives II</div>
+            <div style="font-size:.72rem;color:var(--text-muted)">19:05 · Not started</div>
+          </div>
+        </a>
+        <a href="class-view.html?id=4" class="class-nav-item">
+          <div class="class-num-sm">4</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Integration Basics</div>
+            <div style="font-size:.72rem;color:var(--text-muted)">24:30 · Not started</div>
+          </div>
+        </a>
+        <a href="class-view.html?id=5" class="class-nav-item">
+          <div class="class-num-sm">5</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Fund. Theorem</div>
+            <div style="font-size:.72rem;color:var(--text-muted)">20:15 · Not started</div>
+          </div>
+        </a>
+        <hr class="divider">
+        <a href="exam-page.html?type=exam&id=1" class="btn btn-outline btn-sm btn-full">
+          Take Course Exam
+        </a>
+      </div>
+
+      <div class="card" style="margin-top:16px;padding:16px">
+        <h3 style="font-size:.9rem;font-weight:700;margin-bottom:12px">Your Progress</h3>
+        <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:6px">2 of 12 classes complete</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:17%"></div></div>
+        <div style="font-size:.78rem;color:var(--accent2);margin-top:4px;font-weight:600">17% complete</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--primary);color:white;padding:12px 20px;border-radius:10px;font-size:.88rem;font-weight:500;opacity:0;transition:opacity .3s;z-index:999"></div>
+
+<script src="shared.js"></script>
+<script>
+let quizAnswers = {};
+let quizCorrect = 0;
+let vidPlaying = false;
+let vidInterval;
+
+function playVideo() {
+  if (vidPlaying) return;
+  vidPlaying = true;
+  document.getElementById('play-btn').innerHTML = `<svg width="20" height="20" fill="white" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+  document.querySelector('.play-btn').parentElement.style.background = 'transparent';
+  // Simulate progress
+  let prog = 0;
+  vidInterval = setInterval(() => {
+    prog += 0.3;
+    document.getElementById('vid-progress').style.width = Math.min(prog, 100) + '%';
+    const secs = Math.floor(prog * 11.22);
+    const m = String(Math.floor(secs/60)).padStart(2,'0');
+    const s = String(secs%60).padStart(2,'0');
+    document.getElementById('vid-time').textContent = `${m}:${s} / 18:42`;
+    if (prog >= 100) clearInterval(vidInterval);
+  }, 300);
+  showToast('▶ Video playing...');
+}
+
+function selectChoice(el, isCorrect) {
+  const parent = el.parentElement;
+  parent.querySelectorAll('.choice-item').forEach(c => {
+    c.classList.remove('selected','correct','wrong');
+    c.onclick = null;
+  });
+  if (isCorrect) {
+    el.classList.add('correct');
+    const qNum = Array.from(document.querySelectorAll('.question-card')).indexOf(parent) + 1;
+    quizAnswers[qNum] = true;
+  } else {
+    el.classList.add('wrong');
+    // Show correct
+    const siblings = parent.querySelectorAll('.choice-item');
+    siblings.forEach(s => {
+      if (s.__isCorrect) s.classList.add('correct');
+    });
+    const qNum = Array.from(document.querySelectorAll('.question-card')).indexOf(parent) + 1;
+    quizAnswers[qNum] = false;
+  }
+  // Store correct info
+  parent.querySelectorAll('.choice-item').forEach(c => {
+    if (c === el) c.__isCorrect = isCorrect;
+  });
+}
+
+function submitQuiz() {
+  const total = document.querySelectorAll('.question-card').length;
+  const correct = Object.values(quizAnswers).filter(Boolean).length;
+  document.getElementById('quiz-container').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'block';
+  document.getElementById('quiz-score').textContent = `${correct} / ${total}`;
+}
+
+function resetQuiz() {
+  quizAnswers = {};
+  document.getElementById('quiz-container').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  document.querySelectorAll('.choice-item').forEach(c => {
+    c.classList.remove('selected','correct','wrong');
+    c.onclick = function() { selectChoice(this, !!c.__isCorrect); };
+  });
+}
+
+// Timer
+let timerSecs = 300;
+const timerEl = document.getElementById('quiz-timer');
+const timerInterval = setInterval(() => {
+  timerSecs--;
+  const m = Math.floor(timerSecs / 60);
+  const s = String(timerSecs % 60).padStart(2,'0');
+  timerEl.textContent = `${m}:${s}`;
+  if (timerSecs <= 0) { clearInterval(timerInterval); timerEl.style.color='#ef4444'; timerEl.textContent='Time!'; }
+}, 1000);
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => t.style.opacity='0', 2500);
+}
+</script>
+</body>
+</html>

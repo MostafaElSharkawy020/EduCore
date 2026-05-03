@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login — EduArc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.role-tabs { display:flex; gap:8px; margin-bottom:24px; }
+.role-tab {
+  flex:1; padding:9px; border-radius:8px; border:1.5px solid var(--border);
+  background:transparent; font-family:'DM Sans',sans-serif; font-size:.85rem;
+  font-weight:600; cursor:pointer; transition:all .18s; color:var(--text-muted);
+}
+.role-tab.active { border-color:var(--accent2); background:#eff3ff; color:var(--accent2); }
+.brand-pill {
+  display:inline-block; background:rgba(232,160,69,.15); color:var(--accent);
+  border-radius:100px; padding:4px 14px; font-size:.75rem; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase; margin-bottom:16px;
+}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <!-- LEFT ART -->
+  <div class="auth-left">
+    <div class="auth-art">
+      <div class="auth-tagline">EduArc Platform</div>
+      <h1>Where Knowledge<br>Meets Excellence</h1>
+      <p>Join thousands of students and educators on a platform built for serious learners. Structured courses, expert teachers, and a seamless learning experience.</p>
+      <div style="margin-top:40px;display:flex;gap:32px">
+        <div>
+          <div style="font-size:1.6rem;font-weight:700;font-family:'Playfair Display',serif;color:white">12K+</div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.5)">Students</div>
+        </div>
+        <div>
+          <div style="font-size:1.6rem;font-weight:700;font-family:'Playfair Display',serif;color:white">340+</div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.5)">Courses</div>
+        </div>
+        <div>
+          <div style="font-size:1.6rem;font-weight:700;font-family:'Playfair Display',serif;color:white">98%</div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.5)">Satisfaction</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT FORM -->
+  <div class="auth-right">
+    <a href="my-courses.html" class="topnav-brand" style="font-size:1.5rem;display:block;margin-bottom:32px;text-decoration:none;color:var(--primary)">Edu<span style="color:var(--accent)">Arc</span></a>
+    <h2 style="font-size:1.7rem;font-weight:700;margin-bottom:6px">Welcome back</h2>
+    <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:28px">Sign in to continue your learning journey</p>
+
+    <!-- Role Selector -->
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="selectRole(this,'student')">Student</button>
+      <button class="role-tab" onclick="selectRole(this,'teacher')">Teacher</button>
+      <button class="role-tab" onclick="selectRole(this,'assistant')">Assistant</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" class="form-input" id="email" placeholder="you@example.com" value="alex@example.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-input" id="password" placeholder="••••••••" value="password">
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
+      <a href="#" style="font-size:.85rem;color:var(--accent2);text-decoration:none;font-weight:500">Forgot password?</a>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="doLogin()" style="padding:12px">Sign In</button>
+
+    <div style="text-align:center;margin-top:24px;font-size:.88rem;color:var(--text-muted)">
+      Don't have an account? <a href="signup.html" style="color:var(--accent2);font-weight:600;text-decoration:none">Sign up</a>
+    </div>
+
+    <div id="login-error" class="alert alert-error" style="display:none;margin-top:16px"></div>
+  </div>
+</div>
+
+<script>
+let selectedRole = 'student';
+function selectRole(btn, role) {
+  selectedRole = role;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function doLogin() {
+  const email = document.getElementById('email').value;
+  const pwd = document.getElementById('password').value;
+  if (!email || !pwd) {
+    showError('Please fill in all fields.');
+    return;
+  }
+  // Demo: accept any credentials
+  const nameMap = { student: ['Alex','Johnson'], teacher: ['Sarah','Mitchell'], assistant: ['Tom','Baker'] };
+  const [fname, lname] = nameMap[selectedRole];
+  const user = { id: 1, fname, lname, email, role: selectedRole, biography: 'Passionate about education and continuous learning.', phone: '+1 (555) 000-0000' };
+  sessionStorage.setItem('cms_user', JSON.stringify(user));
+  window.location.href = 'my-courses.html';
+}
+
+function showError(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+// Allow Enter key
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

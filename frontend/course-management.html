@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Course Management — EduArc</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.mgmt-tabs { display:flex; gap:4px; border-bottom:2px solid var(--border); margin-bottom:24px; }
+.mgmt-tab {
+  padding:10px 20px; background:none; border:none; font-family:'DM Sans',sans-serif;
+  font-size:.9rem; font-weight:500; color:var(--text-muted); cursor:pointer;
+  border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .18s;
+}
+.mgmt-tab.active { color:var(--accent2); border-bottom-color:var(--accent2); font-weight:600; }
+.tab-pane { display:none; }
+.tab-pane.active { display:block; }
+.action-group { display:flex; gap:8px; }
+.class-row {
+  display:flex; align-items:center; gap:14px;
+  padding:13px 0; border-bottom:1px solid var(--border);
+}
+.class-row:last-child { border-bottom:none; }
+.class-icon {
+  width:38px; height:38px; border-radius:8px; background:var(--surface);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main-content">
+<div class="page-inner">
+
+  <div class="page-header flex-between">
+    <div>
+      <h1 class="page-title">Course Management</h1>
+      <p class="page-subtitle" id="sub-label">Manage your courses, classes, and assessments</p>
+    </div>
+    <a href="editor-course.html" class="btn btn-accent" id="new-course-btn">+ New Course</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid-4" style="margin-bottom:28px">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#eff3ff">📚</div>
+      <div class="stat-value" id="sc-courses">2</div>
+      <div class="stat-label">Active Courses</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fef3e2">👥</div>
+      <div class="stat-value">55</div>
+      <div class="stat-label">Total Students</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#f0fdf4">📹</div>
+      <div class="stat-value">21</div>
+      <div class="stat-label">Classes Created</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fff0f0">📝</div>
+      <div class="stat-value">5</div>
+      <div class="stat-label">Exams & Quizzes</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="mgmt-tabs">
+    <button class="mgmt-tab active" onclick="switchMgmtTab('courses')">Courses</button>
+    <button class="mgmt-tab" onclick="switchMgmtTab('classes')">Classes</button>
+    <button class="mgmt-tab" onclick="switchMgmtTab('exams')">Exams & Quizzes</button>
+  </div>
+
+  <!-- COURSES TAB -->
+  <div class="tab-pane active" id="tp-courses">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Course Name</th>
+            <th>Status</th>
+            <th>Price</th>
+            <th>Students</th>
+            <th>Classes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="courses-tbody">
+          <tr>
+            <td>
+              <div style="font-weight:600">Advanced Mathematics</div>
+              <div style="font-size:.78rem;color:var(--text-muted)">ID: #1 · TeacherID: T1</div>
+            </td>
+            <td><span class="badge badge-green">Enrollable</span></td>
+            <td style="font-weight:600">$49</td>
+            <td>34</td>
+            <td>12</td>
+            <td>
+              <div class="action-group">
+                <a href="editor-course.html?id=1" class="btn btn-outline btn-sm">Edit</a>
+                <a href="editor-class.html?course=1" class="btn btn-blue btn-sm">+ Class</a>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete('course', 'Advanced Mathematics')">Del</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="font-weight:600">Calculus II</div>
+              <div style="font-size:.78rem;color:var(--text-muted)">ID: #2 · TeacherID: T1</div>
+            </td>
+            <td><span class="badge badge-green">Enrollable</span></td>
+            <td style="font-weight:600">$59</td>
+            <td>21</td>
+            <td>9</td>
+            <td>
+              <div class="action-group">
+                <a href="editor-course.html?id=2" class="btn btn-outline btn-sm">Edit</a>
+                <a href="editor-class.html?course=2" class="btn btn-blue btn-sm">+ Class</a>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete('course','Calculus II')">Del</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CLASSES TAB -->
+  <div class="tab-pane" id="tp-classes">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+      <a href="editor-class.html" class="btn btn-blue">+ New Class</a>
+    </div>
+    <div class="card">
+      <div style="font-size:.85rem;font-weight:600;color:var(--text-muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">Advanced Mathematics</div>
+      <div class="class-row">
+        <div class="class-icon">📹</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.9rem">Class 1: Introduction & Limits</div>
+          <div style="font-size:.78rem;color:var(--text-muted)">ID: C1 · $0 · Video + PDF</div>
+        </div>
+        <div class="action-group">
+          <a href="editor-class.html?id=1" class="btn btn-outline btn-sm">Edit</a>
+          <a href="editor-exam.html?class=1&type=quiz" class="btn btn-blue btn-sm">+ Quiz</a>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('class','Class 1')">Del</button>
+        </div>
+      </div>
+      <div class="class-row">
+        <div class="class-icon">📹</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.9rem">Class 2: Derivatives Part I</div>
+          <div style="font-size:.78rem;color:var(--text-muted)">ID: C2 · $0 · Video + PDF</div>
+        </div>
+        <div class="action-group">
+          <a href="editor-class.html?id=2" class="btn btn-outline btn-sm">Edit</a>
+          <a href="editor-exam.html?class=2&type=quiz" class="btn btn-blue btn-sm">+ Quiz</a>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('class','Class 2')">Del</button>
+        </div>
+      </div>
+      <hr class="divider" style="margin:12px 0">
+      <div style="font-size:.85rem;font-weight:600;color:var(--text-muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">Calculus II</div>
+      <div class="class-row">
+        <div class="class-icon">📹</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.9rem">Class 1: Sequences & Series</div>
+          <div style="font-size:.78rem;color:var(--text-muted)">ID: C3 · $0 · Video + PDF</div>
+        </div>
+        <div class="action-group">
+          <a href="editor-class.html?id=3" class="btn btn-outline btn-sm">Edit</a>
+          <a href="editor-exam.html?class=3&type=quiz" class="btn btn-blue btn-sm">+ Quiz</a>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete('class','Class 1 — Calc II')">Del</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAMS TAB -->
+  <div class="tab-pane" id="tp-exams">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+      <a href="editor-exam.html" class="btn btn-accent">+ New Exam/Quiz</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Title</th><th>Type</th><th>Linked To</th><th>Questions</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600">Mid-term Exam</td>
+            <td><span class="badge badge-accent">Exam</span></td>
+            <td>Advanced Mathematics</td>
+            <td>30</td>
+            <td>
+              <div class="action-group">
+                <a href="editor-exam.html?id=1&type=exam" class="btn btn-outline btn-sm">Edit</a>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete('exam','Mid-term Exam')">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Class 1 Quiz</td>
+            <td><span class="badge badge-blue">Quiz</span></td>
+            <td>Class 1: Intro & Limits</td>
+            <td>5</td>
+            <td>
+              <div class="action-group">
+                <a href="editor-exam.html?id=2&type=quiz" class="btn btn-outline btn-sm">Edit</a>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete('quiz','Class 1 Quiz')">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Final Exam</td>
+            <td><span class="badge badge-accent">Exam</span></td>
+            <td>Advanced Mathematics</td>
+            <td>60</td>
+            <td>
+              <div class="action-group">
+                <a href="editor-exam.html?id=3&type=exam" class="btn btn-outline btn-sm">Edit</a>
+                <button class="btn btn-danger btn-sm" onclick="confirmDelete('exam','Final Exam')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<!-- Confirm Delete Modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:420px">
+    <h2 class="modal-title" style="font-size:1.2rem">Confirm Deletion</h2>
+    <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:20px">
+      Are you sure you want to delete <strong id="del-item-name"></strong>? This action cannot be undone.
+    </p>
+    <div style="display:flex;gap:12px">
+      <button class="btn btn-outline" onclick="closeModal('delete-modal')">Cancel</button>
+      <button class="btn btn-danger" onclick="closeModal('delete-modal');showToast('Item deleted.')">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--primary);color:white;padding:12px 20px;border-radius:10px;font-size:.88rem;font-weight:500;opacity:0;transition:opacity .3s;z-index:999"></div>
+
+<script src="shared.js"></script>
+<script>
+function switchMgmtTab(name) {
+  const tabs = ['courses','classes','exams'];
+  tabs.forEach(t => {
+    document.getElementById('tp-'+t).classList.toggle('active', t===name);
+    document.querySelectorAll('.mgmt-tab')[tabs.indexOf(t)].classList.toggle('active', t===name);
+  });
+}
+
+function confirmDelete(type, name) {
+  document.getElementById('del-item-name').textContent = `${name}`;
+  openModal('delete-modal');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => t.style.opacity='0', 2500);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(sessionStorage.getItem('cms_user')||'{"role":"teacher"}');
+  if (user.role === 'assistant') {
+    document.getElementById('sub-label').textContent = 'Courses assigned to your teacher';
+    document.getElementById('new-course-btn').style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>

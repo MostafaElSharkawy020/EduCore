@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile — EduArc</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.profile-hero {
+  background: var(--primary); border-radius: 16px; padding: 36px;
+  display: flex; align-items: center; gap: 28px; margin-bottom: 28px;
+}
+.profile-avatar-lg {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: var(--accent); display: flex; align-items: center;
+  justify-content: center; font-size: 2rem; font-weight: 700;
+  color: white; flex-shrink: 0; border: 3px solid rgba(255,255,255,.2);
+}
+.profile-info h2 { color: white; font-size: 1.5rem; margin-bottom: 4px; }
+.profile-info p { color: rgba(255,255,255,.6); font-size: .9rem; }
+.tab-bar {
+  display: flex; border-bottom: 2px solid var(--border); margin-bottom: 24px; gap: 4px;
+}
+.tab {
+  padding: 10px 20px; background: none; border: none;
+  font-family: 'DM Sans',sans-serif; font-size: .9rem; font-weight: 500;
+  color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent;
+  margin-bottom: -2px; transition: all .18s;
+}
+.tab.active { color: var(--accent2); border-bottom-color: var(--accent2); font-weight: 600; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main-content">
+<div class="page-inner">
+  <div class="page-header">
+    <h1 class="page-title">My Profile</h1>
+    <p class="page-subtitle">Manage your personal information and preferences</p>
+  </div>
+
+  <!-- Hero -->
+  <div class="profile-hero">
+    <div class="profile-avatar-lg" id="avatar-lg">AJ</div>
+    <div class="profile-info">
+      <h2 id="profile-fullname">Alex Johnson</h2>
+      <p id="profile-email">alex@example.com</p>
+      <div style="margin-top:10px">
+        <span class="badge badge-blue" id="profile-role-badge">Student</span>
+      </div>
+    </div>
+    <div style="margin-left:auto">
+      <button class="btn btn-outline" style="border-color:rgba(255,255,255,.2);color:white;background:rgba(255,255,255,.08)" onclick="showTab('edit')">
+        Edit Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('info')">Personal Info</button>
+    <button class="tab" onclick="showTab('security')">Security</button>
+    <button class="tab" id="tab-card-btn" onclick="showTab('card')">Payment Card</button>
+    <button class="tab" onclick="showTab('edit')">Edit Profile</button>
+  </div>
+
+  <!-- INFO TAB -->
+  <div class="tab-panel active" id="tab-info">
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="font-size:1rem;margin-bottom:18px;font-weight:700">Personal Details</h3>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="flex-between">
+            <span class="text-muted text-sm">First Name</span>
+            <span style="font-weight:500" id="info-fname">Alex</span>
+          </div>
+          <hr class="divider" style="margin:0">
+          <div class="flex-between">
+            <span class="text-muted text-sm">Last Name</span>
+            <span style="font-weight:500" id="info-lname">Johnson</span>
+          </div>
+          <hr class="divider" style="margin:0">
+          <div class="flex-between">
+            <span class="text-muted text-sm">Email</span>
+            <span style="font-weight:500" id="info-email">alex@example.com</span>
+          </div>
+          <hr class="divider" style="margin:0">
+          <div class="flex-between">
+            <span class="text-muted text-sm">Phone</span>
+            <span style="font-weight:500" id="info-phone">+1 (555) 000-0000</span>
+          </div>
+          <hr class="divider" style="margin:0">
+          <div class="flex-between">
+            <span class="text-muted text-sm">Role</span>
+            <span style="font-weight:500" id="info-role">Student</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:1rem;margin-bottom:14px;font-weight:700">Biography</h3>
+        <p class="text-muted" id="info-bio" style="line-height:1.7;font-size:.9rem">No biography added yet.</p>
+        <div id="assistant-section" style="display:none;margin-top:20px">
+          <hr class="divider">
+          <h3 style="font-size:1rem;margin-bottom:10px;font-weight:700">Assignment</h3>
+          <div class="flex-between">
+            <span class="text-muted text-sm">Assigned Teacher</span>
+            <span style="font-weight:500">Prof. Sarah Mitchell</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY TAB -->
+  <div class="tab-panel" id="tab-security">
+    <div class="card" style="max-width:500px">
+      <h3 style="font-size:1rem;margin-bottom:18px;font-weight:700">Change Password</h3>
+      <div class="form-group">
+        <label class="form-label">Current Password</label>
+        <input type="password" class="form-input" placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label class="form-label">New Password</label>
+        <input type="password" class="form-input" placeholder="At least 8 characters">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm New Password</label>
+        <input type="password" class="form-input" placeholder="Repeat new password">
+      </div>
+      <button class="btn btn-primary" onclick="showToast('Password updated!')">Update Password</button>
+    </div>
+  </div>
+
+  <!-- CARD TAB (Student only) -->
+  <div class="tab-panel" id="tab-card">
+    <div class="card" style="max-width:500px">
+      <h3 style="font-size:1rem;margin-bottom:18px;font-weight:700">Saved Payment Card</h3>
+      <div style="background:linear-gradient(135deg,var(--primary),#4f6ef7);border-radius:12px;padding:22px;color:white;margin-bottom:20px">
+        <div style="width:32px;height:24px;background:var(--accent);border-radius:4px;margin-bottom:14px"></div>
+        <div style="letter-spacing:3px;font-size:1rem;margin-bottom:12px">•••• •••• •••• 4242</div>
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;opacity:.75">
+          <span>CARD HOLDER</span><span>EXPIRES</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-weight:600">
+          <span id="card-holder-name">Alex Johnson</span><span>12/27</span>
+        </div>
+      </div>
+      <div class="alert alert-warning" style="font-size:.82rem">To update your card, please contact support or add a new card below.</div>
+      <div class="form-group">
+        <label class="form-label">Cardholder Name</label>
+        <input type="text" class="form-input" placeholder="Alex Johnson">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Card Number</label>
+        <input type="text" class="form-input" placeholder="0000 0000 0000 0000" maxlength="19">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Expiry</label>
+          <input type="text" class="form-input" placeholder="MM/YY">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CVV</label>
+          <input type="text" class="form-input" placeholder="123">
+        </div>
+      </div>
+      <button class="btn btn-accent" onclick="showToast('Card saved!')">Save Card</button>
+    </div>
+  </div>
+
+  <!-- EDIT TAB -->
+  <div class="tab-panel" id="tab-edit">
+    <div class="card" style="max-width:600px">
+      <h3 style="font-size:1rem;margin-bottom:20px;font-weight:700">Edit Personal Information</h3>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-input" id="edit-fname" placeholder="First name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-input" id="edit-lname" placeholder="Last name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="edit-email" placeholder="Email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input type="tel" class="form-input" id="edit-phone" placeholder="+1 (555) 000-0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Biography</label>
+        <textarea class="form-textarea" id="edit-bio" placeholder="Tell students about yourself..."></textarea>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+        <button class="btn btn-outline" onclick="showTab('info')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--primary);color:white;padding:12px 20px;border-radius:10px;font-size:.88rem;font-weight:500;opacity:0;transition:opacity .3s;z-index:999">Saved!</div>
+
+<script src="shared.js"></script>
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  const idx = ['info','security','card','edit'].indexOf(name);
+  document.querySelectorAll('.tab')[idx]?.classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => t.style.opacity='0', 2500);
+}
+
+function saveProfile() {
+  const user = JSON.parse(sessionStorage.getItem('cms_user') || '{}');
+  user.fname = document.getElementById('edit-fname').value || user.fname;
+  user.lname = document.getElementById('edit-lname').value || user.lname;
+  user.email = document.getElementById('edit-email').value || user.email;
+  user.phone = document.getElementById('edit-phone').value || user.phone;
+  user.biography = document.getElementById('edit-bio').value || user.biography;
+  sessionStorage.setItem('cms_user', JSON.stringify(user));
+  populateProfile(user);
+  showTab('info');
+  showToast('Profile updated!');
+}
+
+function populateProfile(user) {
+  const initials = ((user.fname?.[0]||'')+(user.lname?.[0]||'')).toUpperCase();
+  document.getElementById('avatar-lg').textContent = initials;
+  document.getElementById('profile-fullname').textContent = `${user.fname} ${user.lname}`;
+  document.getElementById('profile-email').textContent = user.email;
+  document.getElementById('profile-role-badge').textContent = {student:'Student',teacher:'Teacher',assistant:'Teaching Assistant'}[user.role] || 'Student';
+  document.getElementById('info-fname').textContent = user.fname || '—';
+  document.getElementById('info-lname').textContent = user.lname || '—';
+  document.getElementById('info-email').textContent = user.email || '—';
+  document.getElementById('info-phone').textContent = user.phone || '—';
+  document.getElementById('info-role').textContent = {student:'Student',teacher:'Teacher',assistant:'Teaching Assistant'}[user.role] || '—';
+  document.getElementById('info-bio').textContent = user.biography || 'No biography added yet.';
+  document.getElementById('edit-fname').value = user.fname || '';
+  document.getElementById('edit-lname').value = user.lname || '';
+  document.getElementById('edit-email').value = user.email || '';
+  document.getElementById('edit-phone').value = user.phone || '';
+  document.getElementById('edit-bio').value = user.biography || '';
+  document.getElementById('card-holder-name').textContent = `${user.fname} ${user.lname}`;
+  if (user.role !== 'student') {
+    document.getElementById('tab-card-btn').style.display = 'none';
+  }
+  if (user.role === 'assistant') {
+    document.getElementById('assistant-section').style.display = 'block';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(sessionStorage.getItem('cms_user') || '{"fname":"Alex","lname":"Johnson","role":"student","email":"alex@example.com"}');
+  populateProfile(user);
+});
+</script>
+</body>
+</html>
