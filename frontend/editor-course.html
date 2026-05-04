@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor — Course — EduArc</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.editor-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+@media(max-width:900px){ .editor-layout { grid-template-columns:1fr; } }
+
+.preview-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: calc(var(--nav-h) + 20px);
+}
+.preview-thumb {
+  width: 100%; height: 180px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+  transition: background .3s;
+}
+.preview-body { padding: 18px; }
+.preview-title {
+  font-weight: 700; font-size: 1.05rem; margin-bottom: 6px;
+  color: var(--text); min-height: 24px;
+}
+.preview-meta { font-size: .82rem; color: var(--text-muted); }
+
+.toggle-switch {
+  position: relative; display: inline-block;
+  width: 46px; height: 26px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: #ccc; border-radius: 26px;
+  transition: .3s;
+}
+.toggle-slider:before {
+  content: ""; position: absolute;
+  height: 20px; width: 20px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: .3s;
+}
+input:checked + .toggle-slider { background: var(--accent2); }
+input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+.color-option {
+  width: 32px; height: 32px; border-radius: 8px;
+  cursor: pointer; border: 3px solid transparent;
+  transition: all .18s; flex-shrink: 0;
+}
+.color-option.selected { border-color: var(--primary); transform: scale(1.15); }
+
+.form-section {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.section-title {
+  font-size: 1rem; font-weight: 700;
+  margin-bottom: 18px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.section-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem;
+}
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main-content">
+<div class="page-inner">
+
+  <!-- Header -->
+  <div class="page-header flex-between">
+    <div>
+      <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a href="course-management.html" style="color:var(--accent2);text-decoration:none">Course Management</a>
+        <span style="margin:0 8px">›</span>
+        <span id="breadcrumb-label">New Course</span>
+      </nav>
+      <h1 class="page-title" id="page-heading">Create New Course</h1>
+      <p class="page-subtitle">Fill in the details below to publish your course</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <a href="course-management.html" class="btn btn-outline">Discard</a>
+      <button class="btn btn-accent" onclick="saveCourse()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Course
+      </button>
+    </div>
+  </div>
+
+  <div class="editor-layout">
+    <!-- LEFT: Form -->
+    <div>
+
+      <!-- Basic Info -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-icon" style="background:#eff3ff">📋</div>
+          Basic Information
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Course Name <span style="color:#ef4444">*</span></label>
+          <input type="text" class="form-input" id="course-name"
+            placeholder="e.g. Advanced Mathematics"
+            oninput="updatePreview()">
+          <div class="form-hint">This will be the public title displayed to students</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Course Description</label>
+          <textarea class="form-textarea" id="course-desc"
+            placeholder="Describe what students will learn, prerequisites, and course goals..."
+            rows="4" oninput="updatePreview()"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="course-category" onchange="updatePreview()">
+              <option value="">Select category</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Science">Science</option>
+              <option value="Language">Language</option>
+              <option value="Programming">Programming</option>
+              <option value="Arts">Arts</option>
+              <option value="History">History</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Difficulty Level</label>
+            <select class="form-select" id="course-level">
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate" selected>Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing & Enrollment -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-icon" style="background:#fef3e2">💰</div>
+          Pricing & Enrollment
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Price (USD) <span style="color:#ef4444">*</span></label>
+            <div style="position:relative">
+              <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-weight:600">$</span>
+              <input type="number" class="form-input" id="course-price"
+                placeholder="0.00" min="0" step="0.01"
+                style="padding-left:28px" oninput="updatePreview()">
+            </div>
+            <div class="form-hint">Set to 0 for a free course</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Enrollment Status</label>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+              <label class="toggle-switch">
+                <input type="checkbox" id="enrollable" checked onchange="updatePreview()">
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="font-size:.9rem;font-weight:500" id="enrollable-label">Open for Enrollment</span>
+            </div>
+            <div class="form-hint">Toggle to open or close enrollment</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Art -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-icon" style="background:#f0fdf4">🎨</div>
+          Course Appearance
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cover Color Theme</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px" id="color-options">
+            <div class="color-option selected" style="background:linear-gradient(135deg,#4f6ef7,#1a1f36)" data-color="#4f6ef7" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:linear-gradient(135deg,#e8a045,#b45309)" data-color="#e8a045" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:linear-gradient(135deg,#22c55e,#166534)" data-color="#22c55e" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:linear-gradient(135deg,#06b6d4,#0e7490)" data-color="#06b6d4" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:linear-gradient(135deg,#8b5cf6,#5b21b6)" data-color="#8b5cf6" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:linear-gradient(135deg,#f43f5e,#9f1239)" data-color="#f43f5e" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:linear-gradient(135deg,#f59e0b,#92400e)" data-color="#f59e0b" onclick="selectColor(this)"></div>
+            <div class="color-option" style="background:linear-gradient(135deg,#10b981,#064e3b)" data-color="#10b981" onclick="selectColor(this)"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Course Emoji Icon</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="emoji-options">
+            ${['📚','🔬','🧮','💻','🎨','✏️','🌍','🎵'].map((e,i) =>
+              `<button onclick="selectEmoji(this,'${e}')" style="width:42px;height:42px;font-size:1.3rem;border:2px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer;transition:all .18s" class="${i===0?'emoji-selected':''}">${e}</button>`
+            ).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions bottom -->
+      <div style="display:flex;gap:12px;justify-content:flex-end;padding-bottom:16px">
+        <a href="course-management.html" class="btn btn-outline">Cancel</a>
+        <button class="btn btn-primary" onclick="saveDraft()">Save as Draft</button>
+        <button class="btn btn-accent" onclick="saveCourse()">
+          Publish Course →
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Live Preview -->
+    <div>
+      <div style="font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Live Preview</div>
+      <div class="preview-card">
+        <div class="preview-thumb" id="preview-thumb" style="background:linear-gradient(135deg,#4f6ef7,#1a1f36)">
+          <span id="preview-emoji">📚</span>
+        </div>
+        <div class="preview-body">
+          <div style="margin-bottom:8px">
+            <span class="badge badge-blue" id="preview-category">Category</span>
+          </div>
+          <div class="preview-title" id="preview-title">Course Name</div>
+          <div class="preview-meta" id="preview-teacher">By You</div>
+          <hr class="divider">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:1.1rem;font-weight:700;color:var(--accent)" id="preview-price">$0</span>
+            <span class="badge" id="preview-enroll-badge" style="background:#e8f5e9;color:#2e7d32">Open</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;padding:16px">
+        <div class="section-title" style="margin-bottom:12px;padding-bottom:8px">
+          <div class="section-icon" style="background:#fef3e2">⚡</div>
+          Quick Actions
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="editor-class.html" class="btn btn-outline btn-full" style="justify-content:flex-start;gap:10px">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add a Class
+          </a>
+          <a href="editor-exam.html?type=exam" class="btn btn-outline btn-full" style="justify-content:flex-start;gap:10px">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add an Exam
+          </a>
+          <a href="course-management.html" class="btn btn-outline btn-full" style="justify-content:flex-start;gap:10px">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to Management
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--primary);color:white;padding:12px 20px;border-radius:10px;font-size:.88rem;font-weight:500;opacity:0;transition:opacity .3s;z-index:999"></div>
+
+<script src="shared.js"></script>
+<script>
+let selectedColor = '#4f6ef7';
+let selectedEmoji = '📚';
+
+// ── Preview updater ──
+function updatePreview() {
+  const name  = document.getElementById('course-name').value || 'Course Name';
+  const price = document.getElementById('course-price').value;
+  const cat   = document.getElementById('course-category').value || 'Category';
+  const open  = document.getElementById('enrollable').checked;
+
+  document.getElementById('preview-title').textContent    = name;
+  document.getElementById('preview-price').textContent    = price ? `$${parseFloat(price).toFixed(2)}` : 'Free';
+  document.getElementById('preview-category').textContent = cat;
+  document.getElementById('preview-enroll-badge').textContent = open ? 'Open' : 'Closed';
+  document.getElementById('preview-enroll-badge').style.background = open ? '#e8f5e9' : '#fef2f2';
+  document.getElementById('preview-enroll-badge').style.color      = open ? '#2e7d32' : '#991b1b';
+  document.getElementById('enrollable-label').textContent = open ? 'Open for Enrollment' : 'Enrollment Closed';
+
+  const user = JSON.parse(sessionStorage.getItem('cms_user') || '{"fname":"You","lname":""}');
+  document.getElementById('preview-teacher').textContent = `By ${user.fname} ${user.lname}`.trim();
+}
+
+function selectColor(el) {
+  document.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedColor = el.dataset.color;
+  document.getElementById('preview-thumb').style.background =
+    `linear-gradient(135deg, ${selectedColor}, var(--primary))`;
+}
+
+function selectEmoji(btn, emoji) {
+  document.querySelectorAll('#emoji-options button').forEach(b => {
+    b.style.borderColor = 'var(--border)';
+    b.style.background  = 'var(--surface2)';
+  });
+  btn.style.borderColor = 'var(--accent2)';
+  btn.style.background  = '#eff3ff';
+  selectedEmoji = emoji;
+  document.getElementById('preview-emoji').textContent = emoji;
+}
+
+function saveCourse(draft = false) {
+  const name = document.getElementById('course-name').value.trim();
+  if (!name) { showToast('⚠️ Course name is required.'); return; }
+  const price = parseFloat(document.getElementById('course-price').value) || 0;
+  if (isNaN(price) || price < 0) { showToast('⚠️ Enter a valid price.'); return; }
+
+  showToast(draft ? '📝 Saved as draft!' : '🎉 Course published successfully!');
+  setTimeout(() => window.location.href = 'course-management.html', 1600);
+}
+
+function saveDraft() { saveCourse(true); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 2500);
+}
+
+// ── Edit mode: populate from query param ──
+document.addEventListener('DOMContentLoaded', () => {
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (id) {
+    document.getElementById('page-heading').textContent = 'Edit Course';
+    document.getElementById('breadcrumb-label').textContent = 'Edit Course';
+    // Demo populate
+    const demo = { 1: { name:'Advanced Mathematics', desc:'Master calculus, linear algebra, and differential equations.', price:49, cat:'Mathematics', enrollable:true },
+                   2: { name:'Calculus II', desc:'Sequences, series and multivariable calculus.', price:59, cat:'Mathematics', enrollable:true } };
+    const c = demo[id];
+    if (c) {
+      document.getElementById('course-name').value      = c.name;
+      document.getElementById('course-desc').value      = c.desc;
+      document.getElementById('course-price').value     = c.price;
+      document.getElementById('course-category').value  = c.cat;
+      document.getElementById('enrollable').checked     = c.enrollable;
+      updatePreview();
+    }
+  } else {
+    updatePreview();
+  }
+});
+</script>
+</body>
+</html>

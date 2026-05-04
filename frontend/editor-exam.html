@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor — Exam & Quiz — EduArc</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.editor-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+@media(max-width:960px){ .editor-layout { grid-template-columns:1fr; } }
+
+.form-section {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.section-title {
+  font-size: 1rem; font-weight: 700;
+  margin-bottom: 18px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.section-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; font-size: .9rem;
+}
+
+/* ── Question card ── */
+.q-card {
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface2);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: box-shadow .2s;
+}
+.q-card:hover { box-shadow: var(--shadow); }
+.q-card-header {
+  background: var(--surface);
+  padding: 12px 18px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.q-num {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--primary); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .78rem; font-weight: 700; flex-shrink: 0;
+}
+.q-card-body { padding: 18px; }
+
+/* ── Choice row ── */
+.choice-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.choice-letter {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700; flex-shrink: 0;
+  color: var(--text-muted); background: var(--surface);
+  transition: all .18s;
+}
+.correct-radio:checked + .choice-row .choice-letter,
+.choice-row.is-correct .choice-letter {
+  background: #22c55e; border-color: #22c55e; color: white;
+}
+.correct-radio { display: none; }
+.choice-input { flex: 1; }
+.mark-correct-btn {
+  padding: 5px 12px; border-radius: 6px; border: 1.5px solid var(--border);
+  background: var(--surface2); color: var(--text-muted);
+  font-family: 'DM Sans',sans-serif; font-size: .75rem; font-weight: 600;
+  cursor: pointer; white-space: nowrap; transition: all .18s;
+}
+.mark-correct-btn.active {
+  background: #f0fdf4; border-color: #22c55e; color: #22c55e;
+}
+.remove-choice-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); font-size: 1rem; padding: 4px;
+  transition: color .18s;
+}
+.remove-choice-btn:hover { color: #ef4444; }
+
+/* ── Type toggle ── */
+.type-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.type-tab {
+  flex: 1; padding: 10px; border-radius: 9px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2); color: var(--text-muted);
+  font-family: 'DM Sans',sans-serif; font-size: .88rem;
+  font-weight: 600; cursor: pointer; transition: all .18s;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.type-tab.active {
+  border-color: var(--accent2); background: #eff3ff; color: var(--accent2);
+}
+
+/* ── Summary sidebar ── */
+.summary-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: calc(var(--nav-h) + 20px);
+}
+.summary-stat {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+  font-size: .88rem;
+}
+.summary-stat:last-of-type { border-bottom: none; }
+.summary-val { font-weight: 700; font-family: 'Playfair Display', serif; }
+
+/* ── Q navigator dots ── */
+.q-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.q-nav-dot {
+  width: 32px; height: 32px; border-radius: 7px;
+  border: 1.5px solid var(--border); background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700; cursor: pointer;
+  color: var(--text-muted); transition: all .18s;
+}
+.q-nav-dot.complete { background: var(--accent2); border-color: var(--accent2); color: white; }
+.q-nav-dot:hover { border-color: var(--primary); }
+
+/* drag handle */
+.drag-handle {
+  cursor: grab; color: var(--text-muted); padding: 0 2px;
+}
+.drag-handle:active { cursor: grabbing; }
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main-content">
+<div class="page-inner">
+
+  <!-- Header -->
+  <div class="page-header flex-between">
+    <div>
+      <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a href="course-management.html" style="color:var(--accent2);text-decoration:none">Course Management</a>
+        <span style="margin:0 8px">›</span>
+        <span id="breadcrumb-label">New Exam</span>
+      </nav>
+      <h1 class="page-title" id="page-heading">Create Exam / Quiz</h1>
+      <p class="page-subtitle">Build questions with multiple-choice answers and mark correct ones</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <a href="course-management.html" class="btn btn-outline">Discard</a>
+      <button class="btn btn-accent" onclick="saveAssessment()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Publish
+      </button>
+    </div>
+  </div>
+
+  <div class="editor-layout">
+    <!-- ══════════ LEFT ══════════ -->
+    <div>
+
+      <!-- Type selector -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-icon" style="background:#eff3ff">🗂</div>
+          Assessment Type
+        </div>
+        <div class="type-tabs">
+          <button class="type-tab active" id="tab-exam" onclick="switchType('exam')">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Exam
+            <span style="font-size:.72rem;color:inherit;opacity:.7">(linked to course)</span>
+          </button>
+          <button class="type-tab" id="tab-quiz" onclick="switchType('quiz')">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Quiz
+            <span style="font-size:.72rem;color:inherit;opacity:.7">(linked to class)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Basic info -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-icon" style="background:#fef3e2">📋</div>
+          Basic Information
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Title <span style="color:#ef4444">*</span></label>
+          <input type="text" class="form-input" id="assess-title"
+            placeholder="e.g. Mid-term Exam" oninput="refreshSummary()">
+        </div>
+
+        <!-- Exam: course link -->
+        <div id="exam-fields">
+          <div class="form-group">
+            <label class="form-label">Linked Course <span style="color:#ef4444">*</span></label>
+            <select class="form-select" id="linked-course" onchange="refreshSummary()">
+              <option value="">Select course…</option>
+              <option value="1">Advanced Mathematics</option>
+              <option value="2">Calculus II</option>
+              <option value="3">English Literature</option>
+            </select>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Duration (minutes)</label>
+              <input type="number" class="form-input" id="exam-duration"
+                placeholder="e.g. 45" min="5" value="45" oninput="refreshSummary()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pass Mark (%)</label>
+              <input type="number" class="form-input" id="exam-pass"
+                placeholder="e.g. 60" min="0" max="100" value="60">
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz: class link -->
+        <div id="quiz-fields" style="display:none">
+          <div class="form-group">
+            <label class="form-label">Linked Class <span style="color:#ef4444">*</span></label>
+            <select class="form-select" id="linked-class" onchange="refreshSummary()">
+              <option value="">Select class…</option>
+              <option value="1">Class 1 – Introduction & Limits</option>
+              <option value="2">Class 2 – Derivatives Part I</option>
+              <option value="3">Class 3 – Sequences & Series</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time Limit (minutes)</label>
+            <input type="number" class="form-input" id="quiz-duration"
+              placeholder="e.g. 10" min="1" value="10" oninput="refreshSummary()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="form-section">
+        <div class="section-title" style="justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="section-icon" style="background:#f0fdf4">❓</div>
+            Questions
+          </div>
+          <span style="font-size:.8rem;color:var(--text-muted);font-weight:400" id="q-count-label">0 questions</span>
+        </div>
+
+        <!-- Questions list -->
+        <div id="questions-list">
+          <!-- injected by JS -->
+        </div>
+
+        <button class="btn btn-outline btn-full" onclick="addQuestion()" style="border-style:dashed;padding:12px;margin-top:4px">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Question
+        </button>
+      </div>
+
+      <!-- Bottom actions -->
+      <div style="display:flex;gap:12px;justify-content:flex-end;padding-bottom:16px">
+        <a href="course-management.html" class="btn btn-outline">Cancel</a>
+        <button class="btn btn-primary" onclick="saveAssessment(true)">Save Draft</button>
+        <button class="btn btn-accent" onclick="saveAssessment()">Publish Assessment →</button>
+      </div>
+    </div>
+
+    <!-- ══════════ RIGHT: Summary ══════════ -->
+    <div>
+      <div style="font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Summary</div>
+
+      <div class="summary-card">
+        <div style="display:inline-block;padding:4px 12px;border-radius:100px;font-size:.75rem;font-weight:700;letter-spacing:.5px;margin-bottom:12px;background:#eff3ff;color:var(--accent2)" id="summary-type-badge">EXAM</div>
+
+        <div style="font-weight:700;font-size:1rem;min-height:20px;margin-bottom:4px" id="summary-title">Untitled</div>
+        <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:14px" id="summary-linked">Not linked yet</div>
+
+        <div class="summary-stat">
+          <span class="text-muted">Questions</span>
+          <span class="summary-val" id="sum-q">0</span>
+        </div>
+        <div class="summary-stat">
+          <span class="text-muted">Choices avg</span>
+          <span class="summary-val" id="sum-choices">—</span>
+        </div>
+        <div class="summary-stat">
+          <span class="text-muted">Duration</span>
+          <span class="summary-val" id="sum-duration">45 min</span>
+        </div>
+        <div class="summary-stat">
+          <span class="text-muted">Answered</span>
+          <span class="summary-val" id="sum-answered">0 / 0</span>
+        </div>
+
+        <hr class="divider">
+
+        <div style="font-size:.82rem;font-weight:600;margin-bottom:8px;color:var(--text-muted)">Question Navigator</div>
+        <div class="q-nav" id="q-nav-dots">
+          <span style="font-size:.8rem;color:var(--text-muted)">No questions yet</span>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Validation -->
+        <div id="validation-list" style="font-size:.82rem;display:flex;flex-direction:column;gap:6px">
+          <!-- injected -->
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="card" style="margin-top:16px;padding:16px">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:10px">💡 Tips</div>
+        <ul style="font-size:.8rem;color:var(--text-muted);line-height:2;padding-left:14px">
+          <li>Each question needs at least 2 choices</li>
+          <li>Mark exactly one choice as correct</li>
+          <li>Use clear, unambiguous wording</li>
+          <li>Aim for balanced distractor options</li>
+          <li>Questions can be reordered by dragging</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--primary);color:white;padding:12px 22px;border-radius:10px;font-size:.88rem;font-weight:500;opacity:0;transition:opacity .3s;z-index:999"></div>
+
+<script src="shared.js"></script>
+<script>
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let assessType = 'exam';   // 'exam' | 'quiz'
+let questions  = [];       // array of question objects
+let qIdSeq     = 0;        // auto-increment id
+
+const LETTERS = ['A','B','C','D','E'];
+
+/* ══════════════════════════════════════════════
+   TYPE SWITCHER
+══════════════════════════════════════════════ */
+function switchType(type) {
+  assessType = type;
+  document.getElementById('tab-exam').classList.toggle('active', type === 'exam');
+  document.getElementById('tab-quiz').classList.toggle('active', type === 'quiz');
+  document.getElementById('exam-fields').style.display = type === 'exam' ? 'block' : 'none';
+  document.getElementById('quiz-fields').style.display = type === 'quiz' ? 'block' : 'none';
+  document.getElementById('summary-type-badge').textContent = type.toUpperCase();
+  document.getElementById('breadcrumb-label').textContent = type === 'exam' ? 'New Exam' : 'New Quiz';
+  refreshSummary();
+}
+
+/* ══════════════════════════════════════════════
+   ADD QUESTION
+══════════════════════════════════════════════ */
+function addQuestion(prefill) {
+  const q = prefill || {
+    id: ++qIdSeq,
+    text: '',
+    choices: ['', ''],
+    correct: null,   // index of correct choice
+  };
+  questions.push(q);
+  renderQuestions();
+  refreshSummary();
+  // Scroll to new question
+  setTimeout(() => {
+    const cards = document.querySelectorAll('.q-card');
+    cards[cards.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 80);
+}
+
+/* ══════════════════════════════════════════════
+   REMOVE QUESTION
+══════════════════════════════════════════════ */
+function removeQuestion(qIndex) {
+  questions.splice(qIndex, 1);
+  renderQuestions();
+  refreshSummary();
+}
+
+/* ══════════════════════════════════════════════
+   ADD CHOICE
+══════════════════════════════════════════════ */
+function addChoice(qIndex) {
+  if (questions[qIndex].choices.length >= 5) {
+    showToast('⚠️ Maximum 5 choices per question');
+    return;
+  }
+  questions[qIndex].choices.push('');
+  renderQuestions();
+  refreshSummary();
+  // focus new input
+  setTimeout(() => {
+    const inputs = document.querySelectorAll(`[data-q="${qIndex}"] .choice-input`);
+    inputs[inputs.length - 1]?.focus();
+  }, 60);
+}
+
+/* ══════════════════════════════════════════════
+   REMOVE CHOICE
+══════════════════════════════════════════════ */
+function removeChoice(qIndex, cIndex) {
+  if (questions[qIndex].choices.length <= 2) {
+    showToast('⚠️ Minimum 2 choices required');
+    return;
+  }
+  questions[qIndex].choices.splice(cIndex, 1);
+  // fix correct pointer
+  if (questions[qIndex].correct === cIndex) questions[qIndex].correct = null;
+  else if (questions[qIndex].correct > cIndex) questions[qIndex].correct--;
+  renderQuestions();
+  refreshSummary();
+}
+
+/* ══════════════════════════════════════════════
+   MARK CORRECT
+══════════════════════════════════════════════ */
+function markCorrect(qIndex, cIndex) {
+  questions[qIndex].correct = cIndex;
+  renderQuestions();
+  refreshSummary();
+}
+
+/* ══════════════════════════════════════════════
+   SYNC LIVE EDITS (text/choices) from DOM → state
+══════════════════════════════════════════════ */
+function syncFromDOM() {
+  questions.forEach((q, qi) => {
+    const card = document.querySelector(`[data-q="${qi}"]`);
+    if (!card) return;
+    q.text = card.querySelector('.q-text-input')?.value || '';
+    card.querySelectorAll('.choice-input').forEach((inp, ci) => {
+      q.choices[ci] = inp.value;
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════
+   RENDER ALL QUESTIONS
+══════════════════════════════════════════════ */
+function renderQuestions() {
+  const list = document.getElementById('questions-list');
+
+  if (questions.length === 0) {
+    list.innerHTML = `
+      <div style="text-align:center;padding:32px 0;color:var(--text-muted)">
+        <div style="font-size:2.5rem;margin-bottom:10px">❓</div>
+        <div style="font-size:.92rem;font-weight:500">No questions yet</div>
+        <div style="font-size:.82rem;margin-top:4px">Click "Add Question" to get started</div>
+      </div>`;
+    document.getElementById('q-count-label').textContent = '0 questions';
+    return;
+  }
+
+  document.getElementById('q-count-label').textContent =
+    `${questions.length} question${questions.length !== 1 ? 's' : ''}`;
+
+  list.innerHTML = questions.map((q, qi) => `
+    <div class="q-card" data-q="${qi}">
+      <!-- Card header -->
+      <div class="q-card-header">
+        <span class="drag-handle" title="Drag to reorder">⠿</span>
+        <div class="q-num">${qi + 1}</div>
+        <span style="flex:1;font-size:.82rem;color:var(--text-muted)">
+          ${q.choices.length} choice${q.choices.length !== 1 ? 's' : ''}
+          ${q.correct !== null ? ' · <span style="color:#22c55e;font-weight:600">✓ Correct set</span>' : ' · <span style="color:#f59e0b">⚠ No correct marked</span>'}
+        </span>
+        <button onclick="duplicateQuestion(${qi})" title="Duplicate" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:.85rem;padding:4px 8px" title="Duplicate">⧉</button>
+        <button onclick="syncFromDOM();removeQuestion(${qi})" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:1rem;padding:4px 8px" title="Delete question">✕</button>
+      </div>
+
+      <!-- Card body -->
+      <div class="q-card-body">
+        <!-- Question text -->
+        <div class="form-group" style="margin-bottom:16px">
+          <label class="form-label" style="font-size:.8rem">Question Text <span style="color:#ef4444">*</span></label>
+          <textarea class="form-textarea q-text-input" rows="2"
+            placeholder="Type your question here…"
+            oninput="syncFromDOM();refreshSummary()"
+            style="min-height:70px">${escHtml(q.text)}</textarea>
+        </div>
+
+        <!-- Choices -->
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label" style="font-size:.8rem">Answer Choices</label>
+          ${q.choices.map((c, ci) => `
+            <div class="choice-row" style="margin-bottom:8px">
+              <div class="choice-letter ${q.correct === ci ? 'is-correct' : ''}"
+                   style="${q.correct === ci ? 'background:#22c55e;border-color:#22c55e;color:white;' : ''}">
+                ${LETTERS[ci]}
+              </div>
+              <input type="text" class="form-input choice-input"
+                value="${escHtml(c)}"
+                placeholder="Choice ${LETTERS[ci]}…"
+                oninput="syncFromDOM()"
+                style="flex:1;${q.correct === ci ? 'border-color:#22c55e;background:#f0fdf4;' : ''}">
+              <button class="mark-correct-btn ${q.correct === ci ? 'active' : ''}"
+                onclick="syncFromDOM();markCorrect(${qi},${ci})">
+                ${q.correct === ci ? '✓ Correct' : 'Mark correct'}
+              </button>
+              <button class="remove-choice-btn" onclick="syncFromDOM();removeChoice(${qi},${ci})" title="Remove choice">✕</button>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Add choice -->
+        ${q.choices.length < 5 ? `
+          <button onclick="syncFromDOM();addChoice(${qi})" class="btn btn-outline btn-sm" style="border-style:dashed">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Choice
+          </button>` : `<span style="font-size:.78rem;color:var(--text-muted)">Maximum 5 choices reached</span>`}
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════════════
+   DUPLICATE QUESTION
+══════════════════════════════════════════════ */
+function duplicateQuestion(qi) {
+  syncFromDOM();
+  const orig = questions[qi];
+  const clone = {
+    id: ++qIdSeq,
+    text: orig.text + ' (copy)',
+    choices: [...orig.choices],
+    correct: orig.correct,
+  };
+  questions.splice(qi + 1, 0, clone);
+  renderQuestions();
+  refreshSummary();
+}
+
+/* ══════════════════════════════════════════════
+   SUMMARY SIDEBAR
+══════════════════════════════════════════════ */
+function refreshSummary() {
+  const title   = document.getElementById('assess-title').value || 'Untitled';
+  const durEl   = assessType === 'exam'
+                  ? document.getElementById('exam-duration')
+                  : document.getElementById('quiz-duration');
+  const dur     = durEl?.value ? `${durEl.value} min` : '—';
+  const courseEl = assessType === 'exam'
+                   ? document.getElementById('linked-course')
+                   : document.getElementById('linked-class');
+  const linked  = courseEl?.options[courseEl.selectedIndex]?.text || 'Not linked yet';
+
+  const answered = questions.filter(q => q.correct !== null && q.text.trim()).length;
+  const totalQ   = questions.length;
+  const avgChoices = totalQ
+    ? (questions.reduce((s, q) => s + q.choices.length, 0) / totalQ).toFixed(1)
+    : '—';
+
+  document.getElementById('summary-title').textContent  = title;
+  document.getElementById('summary-linked').textContent = linked === 'Select course…' || linked === 'Select class…' ? 'Not linked yet' : linked;
+  document.getElementById('sum-q').textContent          = totalQ;
+  document.getElementById('sum-choices').textContent    = avgChoices;
+  document.getElementById('sum-duration').textContent   = dur;
+  document.getElementById('sum-answered').textContent   = `${answered} / ${totalQ}`;
+
+  // Nav dots
+  const dotsEl = document.getElementById('q-nav-dots');
+  if (totalQ === 0) {
+    dotsEl.innerHTML = `<span style="font-size:.8rem;color:var(--text-muted)">No questions yet</span>`;
+  } else {
+    dotsEl.innerHTML = questions.map((q, i) => {
+      const ok = q.correct !== null && q.text.trim();
+      return `<div class="q-nav-dot ${ok ? 'complete' : ''}" onclick="scrollToQ(${i})" title="Q${i+1}">${i+1}</div>`;
+    }).join('');
+  }
+
+  // Validation list
+  const checks = [
+    { label: 'Title set',             ok: !!document.getElementById('assess-title').value.trim() },
+    { label: 'Linked to course/class',ok: courseEl?.value !== '' },
+    { label: 'Has questions',         ok: totalQ > 0 },
+    { label: 'All questions have text',ok: questions.every(q => q.text.trim()) },
+    { label: 'All correct answers set',ok: totalQ > 0 && questions.every(q => q.correct !== null) },
+  ];
+  document.getElementById('validation-list').innerHTML = checks.map(c => `
+    <div style="display:flex;align-items:center;gap:7px;color:${c.ok ? '#22c55e' : '#f59e0b'}">
+      <span style="font-size:1rem">${c.ok ? '✓' : '○'}</span>
+      <span>${c.label}</span>
+    </div>
+  `).join('');
+}
+
+function scrollToQ(i) {
+  document.querySelectorAll('.q-card')[i]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ══════════════════════════════════════════════
+   SAVE / PUBLISH
+══════════════════════════════════════════════ */
+function saveAssessment(draft = false) {
+  syncFromDOM();
+  const title = document.getElementById('assess-title').value.trim();
+  if (!title) { showToast('⚠️ Please enter a title.'); return; }
+
+  const courseEl = assessType === 'exam'
+    ? document.getElementById('linked-course')
+    : document.getElementById('linked-class');
+  if (!courseEl.value) {
+    showToast(`⚠️ Please select a linked ${assessType === 'exam' ? 'course' : 'class'}.`);
+    return;
+  }
+
+  if (!draft) {
+    if (questions.length === 0) { showToast('⚠️ Add at least one question.'); return; }
+    const missingText    = questions.some(q => !q.text.trim());
+    const missingCorrect = questions.some(q => q.correct === null);
+    if (missingText)    { showToast('⚠️ All questions must have text.'); return; }
+    if (missingCorrect) { showToast('⚠️ Mark the correct answer for every question.'); return; }
+  }
+
+  showToast(draft ? '📝 Saved as draft!' : `🎉 ${assessType === 'exam' ? 'Exam' : 'Quiz'} published!`);
+  setTimeout(() => window.location.href = 'course-management.html', 1600);
+}
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 2800);
+}
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const type   = params.get('type') || 'exam';
+  const id     = params.get('id');
+  const classQ = params.get('class');
+
+  // Switch type from URL
+  switchType(type);
+
+  // Pre-select class if coming from class editor
+  if (classQ) {
+    const el = document.getElementById('linked-class');
+    if (el) el.value = classQ;
+  }
+
+  // Edit mode: load demo data
+  if (id) {
+    document.getElementById('page-heading').textContent     = type === 'exam' ? 'Edit Exam' : 'Edit Quiz';
+    document.getElementById('breadcrumb-label').textContent = type === 'exam' ? 'Edit Exam' : 'Edit Quiz';
+
+    const DEMO_EXAMS = {
+      1: {
+        title: 'Mid-term Exam', course: '1', duration: 45, pass: 60,
+        questions: [
+          { id:1, text:'What is the derivative of f(x) = x³?', choices:['x²','3x²','3x³','x³'], correct:1 },
+          { id:2, text:'The integral of 1/x is:', choices:['x⁻²','ln|x| + C','1/x² + C','e^x + C'], correct:1 },
+          { id:3, text:'What rule differentiates a product of two functions?', choices:['Chain Rule','Power Rule','Product Rule','Quotient Rule'], correct:2 },
+        ]
+      },
+      2: {
+        title: 'Class 1 Quiz', class: '1', duration: 10,
+        questions: [
+          { id:1, text:'What does lim(x→a) f(x) = L mean?', choices:['f(a) = L','As x→a, f(x)→L','x cannot equal a'], correct:1 },
+          { id:2, text:'What is lim(x→2) (x²-4)/(x-2)?', choices:['0','Undefined','4','2'], correct:2 },
+        ]
+      },
+    };
+
+    const demo = DEMO_EXAMS[id];
+    if (demo) {
+      document.getElementById('assess-title').value = demo.title;
+      if (demo.course) {
+        document.getElementById('linked-course').value = demo.course;
+        document.getElementById('exam-duration').value = demo.duration;
+        document.getElementById('exam-pass').value     = demo.pass;
+      }
+      if (demo.class) {
+        document.getElementById('linked-class').value  = demo.class;
+        document.getElementById('quiz-duration').value = demo.duration;
+      }
+      qIdSeq = demo.questions.length;
+      questions = demo.questions.map(q => ({ ...q }));
+    }
+  } else {
+    // Fresh: add two starter questions
+    addQuestion({ id: ++qIdSeq, text: '', choices: ['', '', '', ''], correct: null });
+    addQuestion({ id: ++qIdSeq, text: '', choices: ['', '', '', ''], correct: null });
+    return; // addQuestion already renders
+  }
+
+  renderQuestions();
+  refreshSummary();
+});
+</script>
+</body>
+</html>
