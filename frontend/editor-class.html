@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor — Class — EduArc</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.editor-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+@media(max-width:900px){ .editor-layout { grid-template-columns:1fr; } }
+
+.form-section {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.section-title {
+  font-size: 1rem; font-weight: 700;
+  margin-bottom: 18px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.section-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem;
+}
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 10px; padding: 28px;
+  text-align: center; cursor: pointer;
+  transition: all .2s; background: var(--surface);
+}
+.upload-zone:hover {
+  border-color: var(--accent2);
+  background: #f0f3ff;
+}
+.upload-zone.has-file {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+.upload-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.upload-label { font-size: .88rem; font-weight: 600; color: var(--text-muted); }
+.upload-hint { font-size: .78rem; color: var(--text-muted); margin-top: 4px; }
+.file-chosen { font-size: .85rem; color: #22c55e; font-weight: 600; margin-top: 6px; display:none; }
+
+.preview-class-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: calc(var(--nav-h) + 20px);
+}
+.preview-class-thumb {
+  width: 100%; height: 140px;
+  background: linear-gradient(135deg, var(--primary), #2d3566);
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px;
+}
+.thumb-icon-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.1);
+  padding: 8px 14px; border-radius: 100px;
+  color: rgba(255,255,255,.8); font-size: .82rem; font-weight: 600;
+}
+
+.toggle-switch {
+  position: relative; display: inline-block;
+  width: 46px; height: 26px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: #ccc; border-radius: 26px; transition: .3s;
+}
+.toggle-slider:before {
+  content: ""; position: absolute;
+  height: 20px; width: 20px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: .3s;
+}
+input:checked + .toggle-slider { background: var(--accent2); }
+input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+.checklist-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px;
+  font-size: .88rem; border: 1.5px solid var(--border);
+  background: var(--surface2); margin-bottom: 8px;
+  transition: all .18s;
+}
+.checklist-item.checked {
+  border-color: #22c55e; background: #f0fdf4;
+}
+.check-circle {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; background: var(--surface);
+}
+.checklist-item.checked .check-circle {
+  border-color: #22c55e; background: #22c55e; color: white;
+}
+</style>
+</head>
+<body>
+<nav class="topnav" id="topnav"></nav>
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main-content">
+<div class="page-inner">
+
+  <!-- Header -->
+  <div class="page-header flex-between">
+    <div>
+      <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a href="course-management.html" style="color:var(--accent2);text-decoration:none">Course Management</a>
+        <span style="margin:0 8px">›</span>
+        <span id="breadcrumb-label">New Class</span>
+      </nav>
+      <h1 class="page-title" id="page-heading">Create New Class</h1>
+      <p class="page-subtitle">Add a class with video, PDFs, and optional quiz</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <a href="course-management.html" class="btn btn-outline">Discard</a>
+      <button class="btn btn-accent" onclick="saveClass()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Class
+      </button>
+    </div>
+  </div>
+
+  <div class="editor-layout">
+    <!-- LEFT: Form -->
+    <div>
+
+      <!-- Basic Info -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-icon" style="background:#eff3ff">📋</div>
+          Class Information
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Class Name <span style="color:#ef4444">*</span></label>
+          <input type="text" class="form-input" id="class-name"
+            placeholder="e.g. Introduction & Limits"
+            oninput="updateClassPreview()">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Class Description</label>
+          <textarea class="form-textarea" id="class-desc"
+            placeholder="What will students learn in this class?"
+            rows="3"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Parent Course <span style="color:#ef4444">*</span></label>
+            <select class="form-select" id="class-course" onchange="updateClassPreview()">
+              <option value="">Select course</option>
+              <option value="1">Advanced Mathematics</option>
+              <option value="2">Calculus II</option>
+              <option value="3">English Literature</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Class Order / Number</label>
+            <input type="number" class="form-input" id="class-order"
+              placeholder="e.g. 3" min="1" value="1">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Class Price (USD)</label>
+            <div style="position:relative">
+              <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-weight:600">$</span>
+              <input type="number" class="form-input" id="class-price"
+                placeholder="0.00" min="0" step="0.01"
+                style="padding-left:28px" value="0">
+            </div>
+            <div class="form-hint">Usually 0 if course is already paid</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estimated Duration</label>
+            <div style="display:flex;gap:8px">
+              <input type="number" class="form-input" id="class-min" placeholder="min" min="1" style="flex:1">
+              <select class="form-select" style="width:80px">
+                <option>min</option>
+                <option>hrs</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-icon" style="background:#fef3e2">🎬</div>
+          Lecture Video
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Video URL</label>
+          <input type="url" class="form-input" id="video-url"
+            placeholder="https://www.youtube.com/watch?v=..."
+            oninput="updateClassPreview()">
+          <div class="form-hint">Paste a YouTube, Vimeo, or direct MP4 URL</div>
+        </div>
+
+        <div style="text-align:center;padding:8px 0;color:var(--text-muted);font-size:.82rem">— or upload directly —</div>
+
+        <div class="upload-zone" id="video-upload-zone" onclick="triggerUpload('video-file')">
+          <div class="upload-icon">📹</div>
+          <div class="upload-label">Click to upload video file</div>
+          <div class="upload-hint">MP4, MOV, WebM — max 2GB</div>
+          <div class="file-chosen" id="video-chosen">✓ Video selected</div>
+          <input type="file" id="video-file" accept="video/*" style="display:none" onchange="fileChosen('video-file','video-upload-zone','video-chosen')">
+        </div>
+      </div>
+
+      <!-- PDFs -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-icon" style="background:#f0fdf4">📄</div>
+          Class Materials (PDF)
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Lecture Notes PDF</label>
+            <div class="upload-zone" id="pdf-upload-zone" onclick="triggerUpload('pdf-file')">
+              <div class="upload-icon">📑</div>
+              <div class="upload-label">Upload PDF</div>
+              <div class="upload-hint">Lecture notes or slides</div>
+              <div class="file-chosen" id="pdf-chosen">✓ PDF selected</div>
+              <input type="file" id="pdf-file" accept=".pdf" style="display:none" onchange="fileChosen('pdf-file','pdf-upload-zone','pdf-chosen')">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Homework / Assignment PDF</label>
+            <div class="upload-zone" id="hw-upload-zone" onclick="triggerUpload('hw-file')">
+              <div class="upload-icon">📝</div>
+              <div class="upload-label">Upload PDF</div>
+              <div class="upload-hint">Homework or problem set</div>
+              <div class="file-chosen" id="hw-chosen">✓ PDF selected</div>
+              <input type="file" id="hw-file" accept=".pdf" style="display:none" onchange="fileChosen('hw-file','hw-upload-zone','hw-chosen')">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz toggle -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="section-icon" style="background:#fff0f0">❓</div>
+          Class Quiz
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+          <label class="toggle-switch">
+            <input type="checkbox" id="has-quiz" onchange="toggleQuizOption()">
+            <span class="toggle-slider"></span>
+          </label>
+          <span style="font-size:.9rem;font-weight:500">Attach a quiz to this class</span>
+        </div>
+        <div id="quiz-option" style="display:none">
+          <div class="alert alert-info" style="margin-bottom:12px;font-size:.85rem">
+            A quiz editor will open after saving this class, or you can create it from Course Management.
+          </div>
+          <a href="editor-exam.html?type=quiz" class="btn btn-blue btn-sm">Open Quiz Editor →</a>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:12px;justify-content:flex-end;padding-bottom:16px">
+        <a href="course-management.html" class="btn btn-outline">Cancel</a>
+        <button class="btn btn-primary" onclick="saveClass(true)">Save as Draft</button>
+        <button class="btn btn-accent" onclick="saveClass()">Publish Class →</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Preview + Checklist -->
+    <div>
+      <div style="font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Class Preview</div>
+
+      <div class="preview-class-card">
+        <div class="preview-class-thumb">
+          <div class="thumb-icon-pill" id="prev-has-video" style="opacity:.4">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Video
+          </div>
+          <div class="thumb-icon-pill" id="prev-has-pdf" style="opacity:.4">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+            PDF
+          </div>
+          <div class="thumb-icon-pill" id="prev-has-quiz" style="opacity:.4">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Quiz
+          </div>
+        </div>
+        <div style="padding:16px">
+          <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:4px" id="prev-course-name">No course selected</div>
+          <div style="font-weight:700;font-size:.95rem;min-height:20px" id="prev-class-name">Class Name</div>
+          <hr class="divider" style="margin:10px 0">
+          <div style="display:flex;justify-content:space-between;font-size:.82rem;color:var(--text-muted)">
+            <span id="prev-duration">—</span>
+            <span id="prev-price">Free</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist -->
+      <div class="card" style="margin-top:16px;padding:16px">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:12px">Completion Checklist</div>
+        <div class="checklist-item" id="chk-name">
+          <div class="check-circle" id="chk-name-icon">✓</div>
+          <span style="font-size:.85rem">Class name set</span>
+        </div>
+        <div class="checklist-item" id="chk-course">
+          <div class="check-circle" id="chk-course-icon">✓</div>
+          <span style="font-size:.85rem">Course assigned</span>
+        </div>
+        <div class="checklist-item" id="chk-video">
+          <div class="check-circle" id="chk-video-icon">✓</div>
+          <span style="font-size:.85rem">Video uploaded or linked</span>
+        </div>
+        <div class="checklist-item" id="chk-pdf">
+          <div class="check-circle" id="chk-pdf-icon">✓</div>
+          <span style="font-size:.85rem">Lecture PDF uploaded</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--primary);color:white;padding:12px 20px;border-radius:10px;font-size:.88rem;font-weight:500;opacity:0;transition:opacity .3s;z-index:999"></div>
+
+<script src="shared.js"></script>
+<script>
+const COURSE_NAMES = { '1':'Advanced Mathematics','2':'Calculus II','3':'English Literature' };
+let hasVideo = false, hasPDF = false, hasHW = false;
+
+function updateClassPreview() {
+  const name     = document.getElementById('class-name').value || 'Class Name';
+  const courseId = document.getElementById('class-course').value;
+  const price    = document.getElementById('class-price').value;
+  const mins     = document.getElementById('class-min').value;
+  const url      = document.getElementById('video-url').value;
+
+  document.getElementById('prev-class-name').textContent  = name;
+  document.getElementById('prev-course-name').textContent = courseId ? COURSE_NAMES[courseId] : 'No course selected';
+  document.getElementById('prev-price').textContent       = (price && parseFloat(price) > 0) ? `$${parseFloat(price).toFixed(2)}` : 'Free';
+  document.getElementById('prev-duration').textContent    = mins ? `${mins} min` : '—';
+
+  // Video indicator
+  const vidActive = url || hasVideo;
+  document.getElementById('prev-has-video').style.opacity = vidActive ? '1' : '.4';
+  document.getElementById('prev-has-pdf').style.opacity   = hasPDF ? '1' : '.4';
+  document.getElementById('prev-has-quiz').style.opacity  = document.getElementById('has-quiz').checked ? '1' : '.4';
+
+  // Checklist
+  setCheck('chk-name',   !!document.getElementById('class-name').value.trim());
+  setCheck('chk-course', !!courseId);
+  setCheck('chk-video',  vidActive);
+  setCheck('chk-pdf',    hasPDF);
+}
+
+function setCheck(id, done) {
+  const item = document.getElementById(id);
+  const icon = document.getElementById(id+'-icon');
+  if (done) { item.classList.add('checked'); icon.textContent = '✓'; }
+  else       { item.classList.remove('checked'); icon.textContent = ''; }
+}
+
+function triggerUpload(id) { document.getElementById(id).click(); }
+
+function fileChosen(inputId, zoneId, msgId) {
+  const file = document.getElementById(inputId).files[0];
+  if (!file) return;
+  document.getElementById(zoneId).classList.add('has-file');
+  document.getElementById(msgId).style.display = 'block';
+  document.getElementById(msgId).textContent   = `✓ ${file.name}`;
+  if (inputId === 'video-file') hasVideo = true;
+  if (inputId === 'pdf-file')   hasPDF   = true;
+  if (inputId === 'hw-file')    hasHW    = true;
+  updateClassPreview();
+}
+
+function toggleQuizOption() {
+  const show = document.getElementById('has-quiz').checked;
+  document.getElementById('quiz-option').style.display = show ? 'block' : 'none';
+  updateClassPreview();
+}
+
+function saveClass(draft = false) {
+  const name = document.getElementById('class-name').value.trim();
+  if (!name) { showToast('⚠️ Class name is required.'); return; }
+  const course = document.getElementById('class-course').value;
+  if (!course) { showToast('⚠️ Please select a parent course.'); return; }
+  showToast(draft ? '📝 Saved as draft!' : '🎉 Class published!');
+  setTimeout(() => window.location.href = 'course-management.html', 1600);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 2500);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Pre-select course from query param
+  const params = new URLSearchParams(window.location.search);
+  const courseId = params.get('course');
+  if (courseId) document.getElementById('class-course').value = courseId;
+
+  // Edit mode
+  const id = params.get('id');
+  if (id) {
+    document.getElementById('page-heading').textContent    = 'Edit Class';
+    document.getElementById('breadcrumb-label').textContent = 'Edit Class';
+    const demo = {
+      1:{ name:'Introduction & Limits', course:'1', price:0, mins:18 },
+      2:{ name:'Derivatives Part I', course:'1', price:0, mins:22 },
+      3:{ name:'Sequences & Series', course:'2', price:0, mins:20 },
+    };
+    const c = demo[id];
+    if (c) {
+      document.getElementById('class-name').value   = c.name;
+      document.getElementById('class-course').value = c.course;
+      document.getElementById('class-price').value  = c.price;
+      document.getElementById('class-min').value    = c.mins;
+    }
+  }
+
+  updateClassPreview();
+
+  // Live listeners
+  ['class-name','class-course','class-price','class-min','video-url'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', updateClassPreview);
+    document.getElementById(id)?.addEventListener('change', updateClassPreview);
+  });
+});
+</script>
+</body>
+</html>
