@@ -1,0 +1,114 @@
+@model EduCore.Models.Course
+
+<style>
+    .editor-layout { display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start; }
+    @@media(max-width:900px){ .editor-layout { grid-template-columns:1fr; } }
+
+    .form-section { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:16px; box-shadow:var(--shadow); }
+    .section-title { font-size:1rem; font-weight:700; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+    .section-icon { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:.9rem; }
+
+    .preview-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); position:sticky; top:calc(var(--nav-h) + 20px); }
+    .preview-thumb { width:100%; height:180px; display:flex; align-items:center; justify-content:center; font-size:2.5rem; color:#fff; background:linear-gradient(135deg,#4f6ef7,#1a1f36); }
+    .preview-body { padding:18px; }
+    .preview-title { font-weight:700; font-size:1.05rem; margin-bottom:6px; color:var(--text); min-height:24px; }
+    .preview-meta { font-size:.82rem; color:var(--text-muted); }
+
+    .toggle-switch { position:relative; display:inline-block; width:46px; height:26px; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; cursor:pointer; inset:0; background:#ccc; border-radius:26px; transition:.3s; }
+    .toggle-slider:before { content:""; position:absolute; height:20px; width:20px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.3s; }
+    input:checked + .toggle-slider { background:var(--accent2); }
+    input:checked + .toggle-slider:before { transform:translateX(20px); }
+
+    .field-error { color:#ef4444; font-size:.8rem; }
+</style>
+
+<form method="post">
+    <div asp-validation-summary="All" class="field-error" style="margin-bottom:12px"></div>
+    <input type="hidden" asp-for="ID" />
+
+    <div class="editor-layout">
+        <!-- LEFT: form -->
+        <div>
+            <div class="form-section">
+                <div class="section-title">
+                    <div class="section-icon" style="background:#eff3ff">📋</div>
+                    Basic Information
+                </div>
+                <div class="form-group">
+                    <label class="form-label" asp-for="Name">Course Name <span style="color:#ef4444">*</span></label>
+                    <input class="form-input" asp-for="Name" placeholder="e.g. Advanced Mathematics" oninput="updatePreview()" />
+                    <span asp-validation-for="Name" class="field-error"></span>
+                    <div class="form-hint">This will be the public title displayed to students</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">
+                    <div class="section-icon" style="background:#fef3e2">💰</div>
+                    Pricing &amp; Enrollment
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label" asp-for="Price">Price (EGP) <span style="color:#ef4444">*</span></label>
+                        <input class="form-input" asp-for="Price" type="number" min="0" step="0.01" oninput="updatePreview()" />
+                        <span asp-validation-for="Price" class="field-error"></span>
+                        <div class="form-hint">Set to 0 for a free course</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Enrollment Status</label>
+                        <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+                            <label class="toggle-switch">
+                                <input asp-for="Enrollable" onchange="updatePreview()" />
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span style="font-size:.9rem;font-weight:500" id="enrollable-label">Open for Enrollment</span>
+                        </div>
+                        <div class="form-hint">Toggle to open or close enrollment</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:flex-end;padding-bottom:16px">
+                <a asp-action="Index" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-accent">Save Course</button>
+            </div>
+        </div>
+
+        <!-- RIGHT: live preview -->
+        <div>
+            <div style="font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Live Preview</div>
+            <div class="preview-card">
+                <div class="preview-thumb">📚</div>
+                <div class="preview-body">
+                    <div class="preview-title" id="preview-title">Course Name</div>
+                    <div class="preview-meta">By Demo Teacher</div>
+                    <hr class="divider">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="font-size:1.1rem;font-weight:700;color:var(--accent)" id="preview-price">EGP 0</span>
+                        <span class="badge badge-green" id="preview-enroll-badge">Open</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    function updatePreview() {
+        var name = document.getElementById('Name').value || 'Course Name';
+        var price = document.getElementById('Price').value;
+        var open = document.getElementById('Enrollable').checked;
+
+        document.getElementById('preview-title').textContent = name;
+        document.getElementById('preview-price').textContent = price ? 'EGP ' + parseFloat(price).toFixed(2) : 'Free';
+
+        var badge = document.getElementById('preview-enroll-badge');
+        badge.textContent = open ? 'Open' : 'Closed';
+        badge.className = 'badge ' + (open ? 'badge-green' : 'badge-accent');
+
+        document.getElementById('enrollable-label').textContent = open ? 'Open for Enrollment' : 'Enrollment Closed';
+    }
+    document.addEventListener('DOMContentLoaded', updatePreview);
+</script>

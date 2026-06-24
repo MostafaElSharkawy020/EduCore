@@ -1,0 +1,20 @@
+@model EduCore.Models.Class
+@{
+    ViewData["Title"] = "Edit Class";
+}
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-action="Index" style="color:var(--accent2);text-decoration:none">Classes</a>
+        <span style="margin:0 8px">›</span>
+        <span>Edit Class</span>
+    </nav>
+    <h1 class="page-title">Edit Class</h1>
+    <p class="page-subtitle">Update this class's details</p>
+</div>
+
+<partial name="_ClassForm" model="Model" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

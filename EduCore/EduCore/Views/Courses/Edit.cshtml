@@ -1,0 +1,20 @@
+@model EduCore.Models.Course
+@{
+    ViewData["Title"] = "Edit Course";
+}
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-action="Index" style="color:var(--accent2);text-decoration:none">Course Management</a>
+        <span style="margin:0 8px">›</span>
+        <span>Edit Course</span>
+    </nav>
+    <h1 class="page-title">Edit Course</h1>
+    <p class="page-subtitle">Update your course details</p>
+</div>
+
+<partial name="_CourseForm" model="Model" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

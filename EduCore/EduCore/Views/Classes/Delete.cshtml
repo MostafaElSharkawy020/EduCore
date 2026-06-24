@@ -1,0 +1,31 @@
+@model EduCore.Models.Class
+@{
+    ViewData["Title"] = "Delete Class";
+}
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-action="Index" style="color:var(--accent2);text-decoration:none">Classes</a>
+        <span style="margin:0 8px">›</span>
+        <span>Delete Class</span>
+    </nav>
+    <h1 class="page-title">Delete Class</h1>
+</div>
+
+<div class="card" style="max-width:560px">
+    <div class="alert alert-warning">
+        Are you sure you want to delete this class? Its videos and quizzes will also be deleted.
+    </div>
+
+    <h3 style="margin-bottom:6px">@Model.Name</h3>
+    <p class="text-muted text-sm">
+        Course: @Model.Course?.Name ·
+        @Model.Price.ToString("C")
+    </p>
+
+    <form asp-action="Delete" style="margin-top:20px;display:flex;gap:12px">
+        <input type="hidden" asp-for="ID" />
+        <button type="submit" class="btn btn-danger">Delete Class</button>
+        <a asp-action="Index" class="btn btn-outline">Cancel</a>
+    </form>
+</div>

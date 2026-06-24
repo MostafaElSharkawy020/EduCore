@@ -1,7 +1,48 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\Programming\\DEPI\\EduCore\\EduCore\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\models\\class.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\models\\class.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\views\\shared\\_educorelayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\views\\shared\\_educorelayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\views\\courses\\_courseform.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\views\\courses\\_courseform.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\views\\courses\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\views\\courses\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\controllers\\coursescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\controllers\\coursescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\models\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\models\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\views\\courses\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\views\\courses\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|d:\\programming\\depi\\educore\\educore\\educore\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{593FAA6A-2FBA-E8E5-2049-A7BA36AE0A31}|EduCore\\EduCore.csproj|solutionrelative:educore\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +50,141 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 10,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "_EduCoreLayout.cshtml",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Views\\Shared\\_EduCoreLayout.cshtml",
+              "RelativeDocumentMoniker": "EduCore\\Views\\Shared\\_EduCoreLayout.cshtml",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Views\\Shared\\_EduCoreLayout.cshtml",
+              "RelativeToolTip": "EduCore\\Views\\Shared\\_EduCoreLayout.cshtml",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABYAAABZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-24T18:40:08.17Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Views\\Courses\\Index.cshtml",
+              "RelativeDocumentMoniker": "EduCore\\Views\\Courses\\Index.cshtml",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Views\\Courses\\Index.cshtml",
+              "RelativeToolTip": "EduCore\\Views\\Courses\\Index.cshtml",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAB8AAABmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-24T18:15:51.032Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "_CourseForm.cshtml",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Views\\Courses\\_CourseForm.cshtml",
+              "RelativeDocumentMoniker": "EduCore\\Views\\Courses\\_CourseForm.cshtml",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Views\\Courses\\_CourseForm.cshtml",
+              "RelativeToolTip": "EduCore\\Views\\Courses\\_CourseForm.cshtml",
+              "ViewState": "AgIAAEgAAAAAAAAAAAAAAE4AAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-24T16:05:20.971Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Views\\Courses\\Create.cshtml",
+              "RelativeDocumentMoniker": "EduCore\\Views\\Courses\\Create.cshtml",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Views\\Courses\\Create.cshtml",
+              "RelativeToolTip": "EduCore\\Views\\Courses\\Create.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-06-24T16:04:48.011Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CoursesController.cs",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Controllers\\CoursesController.cs",
+              "RelativeDocumentMoniker": "EduCore\\Controllers\\CoursesController.cs",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Controllers\\CoursesController.cs",
+              "RelativeToolTip": "EduCore\\Controllers\\CoursesController.cs",
+              "ViewState": "AgIAACMAAAAAAAAAAAAgwDAAAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T15:51:25.51Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Program.cs",
+              "RelativeDocumentMoniker": "EduCore\\Program.cs",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Program.cs",
+              "RelativeToolTip": "EduCore\\Program.cs",
+              "ViewState": "AgIAAAQAAAAAAAAAAAAAABcAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T15:41:36.395Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\appsettings.json",
+              "RelativeDocumentMoniker": "EduCore\\appsettings.json",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\appsettings.json",
+              "RelativeToolTip": "EduCore\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-06-24T15:41:13.02Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "EduCore\\Data\\AppDbContext.cs",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "EduCore\\Data\\AppDbContext.cs",
+              "ViewState": "AgIAADMAAAAAAAAAAAAAAAsAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T15:37:10.02Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Course.cs",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Models\\Course.cs",
+              "RelativeDocumentMoniker": "EduCore\\Models\\Course.cs",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Models\\Course.cs",
+              "RelativeToolTip": "EduCore\\Models\\Course.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAQwA4AAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T14:59:49.927Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Class.cs",
+              "DocumentMoniker": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Models\\Class.cs",
+              "RelativeDocumentMoniker": "EduCore\\Models\\Class.cs",
+              "ToolTip": "D:\\Programming\\DEPI\\EduCore\\EduCore\\EduCore\\Models\\Class.cs",
+              "RelativeToolTip": "EduCore\\Models\\Class.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAYwBMAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-24T14:59:48.574Z",
+              "EditorCaption": ""
             }
           ]
         }

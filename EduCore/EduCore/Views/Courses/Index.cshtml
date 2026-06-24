@@ -1,0 +1,88 @@
+@model IEnumerable<EduCore.Models.Course>
+@{
+    ViewData["Title"] = "Course Management";
+}
+
+<div class="page-header flex-between">
+    <div>
+        <h1 class="page-title">Course Management</h1>
+        <p class="page-subtitle">Manage your courses and classes</p>
+    </div>
+    <a asp-action="Create" class="btn btn-accent">+ New Course</a>
+</div>
+
+<div class="grid-4" style="margin-bottom:28px">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#eff3ff">📚</div>
+        <div class="stat-value">@Model.Count()</div>
+        <div class="stat-label">Total Courses</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#e8f5e9">✅</div>
+        <div class="stat-value">@Model.Count(c => c.Enrollable)</div>
+        <div class="stat-label">Enrollable</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fef3e2">📹</div>
+        <div class="stat-value">@Model.Sum(c => c.Classes.Count)</div>
+        <div class="stat-label">Classes Created</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff0f0">💰</div>
+        <div class="stat-value">@Model.Where(c => c.Enrollable).Sum(c => c.Price).ToString("CO")</div>
+        <div class="stat-label">Catalog Value</div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You have no courses yet. Click <strong>+ New Course</strong> to create your first one.
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Status</th>
+                    <th>Price</th>
+                    <th>Classes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var course in Model)
+                {
+                    <tr>
+                        <td>
+                            <div style="font-weight:600">@course.Name</div>
+                            <div style="font-size:.78rem;color:var(--text-muted)">ID: #@course.ID</div>
+                        </td>
+                        <td>
+                            @if (course.Enrollable)
+                            {
+                                <span class="badge badge-green">Enrollable</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-accent">Closed</span>
+                            }
+                        </td>
+                        <td style="font-weight:600">@course.Price.ToString("C")</td>
+                        <td>@course.Classes.Count</td>
+                        <td>
+                            <div class="flex gap-8">
+                                <a asp-action="Edit" asp-route-id="@course.ID" class="btn btn-outline btn-sm">Edit</a>
+                                <a asp-controller="Classes" asp-action="Create" asp-route-courseId="@course.ID" class="btn btn-blue btn-sm">+ Class</a>
+                                <a asp-action="Delete" asp-route-id="@course.ID" class="btn btn-danger btn-sm">Del</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

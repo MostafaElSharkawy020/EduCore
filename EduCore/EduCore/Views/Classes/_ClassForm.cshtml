@@ -1,0 +1,110 @@
+@model EduCore.Models.Class
+
+<style>
+    .editor-layout { display:grid; grid-template-columns:1fr 300px; gap:24px; align-items:start; }
+    @@media(max-width:900px){ .editor-layout { grid-template-columns:1fr; } }
+
+    .form-section { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:16px; box-shadow:var(--shadow); }
+    .section-title { font-size:1rem; font-weight:700; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+    .section-icon { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:.9rem; }
+
+    .preview-class-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); position:sticky; top:calc(var(--nav-h) + 20px); }
+    .preview-class-thumb { width:100%; height:140px; background:linear-gradient(135deg,var(--primary),#2d3566); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.85); font-size:2rem; }
+
+    .field-error { color:#ef4444; font-size:.8rem; }
+</style>
+
+<form method="post">
+    <div asp-validation-summary="All" class="field-error" style="margin-bottom:12px"></div>
+    <input type="hidden" asp-for="ID" />
+
+    <div class="editor-layout">
+        <!-- LEFT: form -->
+        <div>
+            <div class="form-section">
+                <div class="section-title">
+                    <div class="section-icon" style="background:#eff3ff">📋</div>
+                    Class Information
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" asp-for="Name">Class Name <span style="color:#ef4444">*</span></label>
+                    <input class="form-input" asp-for="Name" placeholder="e.g. Introduction & Limits" oninput="updateClassPreview()" />
+                    <span asp-validation-for="Name" class="field-error"></span>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label" asp-for="CourseID">Parent Course <span style="color:#ef4444">*</span></label>
+                        <select class="form-select" asp-for="CourseID" asp-items="ViewBag.Courses" onchange="updateClassPreview()">
+                            <option value="">Select course</option>
+                        </select>
+                        <span asp-validation-for="CourseID" class="field-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" asp-for="Price">Class Price (EGP)</label>
+                        <input class="form-input" asp-for="Price" type="number" min="0" step="0.01" oninput="updateClassPreview()" />
+                        <span asp-validation-for="Price" class="field-error"></span>
+                        <div class="form-hint">Usually 0 if the course is already paid</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">
+                    <div class="section-icon" style="background:#f0fdf4">📄</div>
+                    Class Materials
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label" asp-for="PDF">Lecture Notes PDF</label>
+                        <input class="form-input" asp-for="PDF" placeholder="https://… or file path" />
+                        <span asp-validation-for="PDF" class="field-error"></span>
+                        <div class="form-hint">Link or path to the lecture PDF (optional)</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" asp-for="HomeworkPDF">Homework PDF</label>
+                        <input class="form-input" asp-for="HomeworkPDF" placeholder="https://… or file path" />
+                        <span asp-validation-for="HomeworkPDF" class="field-error"></span>
+                        <div class="form-hint">Link or path to the homework PDF (optional)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:flex-end;padding-bottom:16px">
+                <a asp-action="Index" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-accent">Save Class</button>
+            </div>
+        </div>
+
+        <!-- RIGHT: live preview -->
+        <div>
+            <div style="font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">Class Preview</div>
+            <div class="preview-class-card">
+                <div class="preview-class-thumb">📹</div>
+                <div style="padding:16px">
+                    <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:4px" id="prev-course-name">No course selected</div>
+                    <div style="font-weight:700;font-size:.95rem;min-height:20px" id="prev-class-name">Class Name</div>
+                    <hr class="divider" style="margin:10px 0">
+                    <div style="display:flex;justify-content:flex-end;font-size:.82rem;color:var(--text-muted)">
+                        <span id="prev-price">Free</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    function updateClassPreview() {
+        var name = document.getElementById('Name').value || 'Class Name';
+        var courseSel = document.getElementById('CourseID');
+        var courseName = (courseSel && courseSel.value) ? courseSel.options[courseSel.selectedIndex].text : 'No course selected';
+        var price = document.getElementById('Price').value;
+
+        document.getElementById('prev-class-name').textContent = name;
+        document.getElementById('prev-course-name').textContent = courseName;
+        document.getElementById('prev-price').textContent = (price && parseFloat(price) > 0) ? 'EGP ' + parseFloat(price).toFixed(2) : 'Free';
+    }
+    document.addEventListener('DOMContentLoaded', updateClassPreview);
+</script>

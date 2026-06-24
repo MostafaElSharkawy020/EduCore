@@ -1,0 +1,31 @@
+@model EduCore.Models.Class
+@{
+    ViewData["Title"] = "Create Class";
+}
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-action="Index" style="color:var(--accent2);text-decoration:none">Classes</a>
+        <span style="margin:0 8px">›</span>
+        <span>New Class</span>
+    </nav>
+    <h1 class="page-title">Create New Class</h1>
+    <p class="page-subtitle">Add a class to one of your courses</p>
+</div>
+
+@if (!(bool)ViewBag.HasCourses)
+{
+    <div class="alert alert-warning">
+        You don't have any courses yet.
+        <a asp-controller="Courses" asp-action="Create" style="color:var(--accent2)">Create a course</a>
+        first, then add classes to it.
+    </div>
+}
+else
+{
+    <partial name="_ClassForm" model="Model" />
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
