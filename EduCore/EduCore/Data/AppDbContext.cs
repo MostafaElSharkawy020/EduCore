@@ -21,6 +21,7 @@ namespace EduCore.Data
         public DbSet<Quiz> Quizzes { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<Choice> Choices { get; set; }
         public DbSet<ExamQuestion> ExamQuestions { get; set; }
         public DbSet<QuizQuestion> QuizQuestions { get; set; }
         public DbSet<StudentCourse> StudentCourses { get; set; }

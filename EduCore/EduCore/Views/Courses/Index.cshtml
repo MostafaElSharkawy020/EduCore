@@ -29,7 +29,7 @@
     </div>
     <div class="stat-card">
         <div class="stat-icon" style="background:#fff0f0">💰</div>
-        <div class="stat-value">@Model.Where(c => c.Enrollable).Sum(c => c.Price).ToString("CO")</div>
+        <div class="stat-value">@Model.Where(c => c.Enrollable).Sum(c => c.Price).ToString("C0")</div>
         <div class="stat-label">Catalog Value</div>
     </div>
 </div>
@@ -77,6 +77,7 @@ else
                             <div class="flex gap-8">
                                 <a asp-action="Edit" asp-route-id="@course.ID" class="btn btn-outline btn-sm">Edit</a>
                                 <a asp-controller="Classes" asp-action="Create" asp-route-courseId="@course.ID" class="btn btn-blue btn-sm">+ Class</a>
+                                <a asp-controller="Exams" asp-action="Index" asp-route-courseId="@course.ID" class="btn btn-blue btn-sm">Exams</a>
                                 <a asp-action="Delete" asp-route-id="@course.ID" class="btn btn-danger btn-sm">Del</a>
                             </div>
                         </td>

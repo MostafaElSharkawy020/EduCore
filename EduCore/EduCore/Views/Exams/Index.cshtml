@@ -1,0 +1,55 @@
+@model IEnumerable<EduCore.Models.Exam>
+@{
+    var course = (EduCore.Models.Course)ViewBag.Course;
+    ViewData["Title"] = "Exams — " + course.Name;
+}
+
+<div class="page-header flex-between">
+    <div>
+        <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+            <a asp-controller="Courses" asp-action="Index" style="color:var(--accent2);text-decoration:none">Courses</a>
+            <span style="margin:0 8px">›</span>
+            <span>@course.Name</span>
+        </nav>
+        <h1 class="page-title">Exams</h1>
+        <p class="page-subtitle">Exams for the course "@course.Name"</p>
+    </div>
+    <a asp-action="Create" asp-route-courseId="@course.ID" class="btn btn-accent">+ New Exam</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No exams yet for this course. Click <strong>+ New Exam</strong> to create one.
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Exam</th>
+                    <th>Questions</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var exam in Model)
+                {
+                    <tr>
+                        <td style="font-weight:600">@exam.Title</td>
+                        <td>@exam.ExamQuestions.Count</td>
+                        <td>
+                            <div class="flex gap-8">
+                                <a asp-action="Details" asp-route-id="@exam.ID" class="btn btn-blue btn-sm">Manage Questions</a>
+                                <a asp-action="Edit" asp-route-id="@exam.ID" class="btn btn-outline btn-sm">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@exam.ID" class="btn btn-danger btn-sm">Del</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,32 @@
+@model EduCore.Models.Video
+
+<style>
+    .form-section { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:16px; box-shadow:var(--shadow); max-width:640px; }
+    .field-error { color:#ef4444; font-size:.8rem; }
+</style>
+
+<form method="post">
+    <div asp-validation-summary="All" class="field-error" style="margin-bottom:12px"></div>
+    <input type="hidden" asp-for="ID" />
+    <input type="hidden" asp-for="ClassID" />
+
+    <div class="form-section">
+        <div class="form-group">
+            <label class="form-label" asp-for="Title">Video Title <span style="color:#ef4444">*</span></label>
+            <input class="form-input" asp-for="Title" placeholder="e.g. Lecture 1 — Introduction" />
+            <span asp-validation-for="Title" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" asp-for="URL">Video URL <span style="color:#ef4444">*</span></label>
+            <input class="form-input" asp-for="URL" placeholder="https://www.youtube.com/watch?v=… , https://vimeo.com/… , or a direct .mp4 link" />
+            <span asp-validation-for="URL" class="field-error"></span>
+            <div class="form-hint">Paste a YouTube, Vimeo, or direct video (.mp4 / .webm) link.</div>
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+            <a asp-action="Index" asp-route-classId="@Model.ClassID" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-accent">Save Video</button>
+        </div>
+    </div>
+</form>

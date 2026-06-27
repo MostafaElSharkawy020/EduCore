@@ -1,0 +1,59 @@
+@model IEnumerable<EduCore.Models.Video>
+@{
+    var cls = (EduCore.Models.Class)ViewBag.Class;
+    ViewData["Title"] = "Videos — " + cls.Name;
+}
+
+<div class="page-header flex-between">
+    <div>
+        <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+            <a asp-controller="Classes" asp-action="Index" style="color:var(--accent2);text-decoration:none">Classes</a>
+            <span style="margin:0 8px">›</span>
+            <span>@cls.Name</span>
+        </nav>
+        <h1 class="page-title">Lecture Videos</h1>
+        <p class="page-subtitle">Videos for the class "@cls.Name"</p>
+    </div>
+    <a asp-action="Create" asp-route-classId="@cls.ID" class="btn btn-accent">+ Add Video</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No videos yet for this class. Click <strong>+ Add Video</strong> to add one.
+    </div>
+}
+else
+{
+    <div class="grid-2">
+        @foreach (var video in Model)
+        {
+            var embed = VideoEmbedHelper.Resolve(video.URL);
+            <div class="card">
+                <div class="video-container" style="margin-bottom:12px">
+                    @if (embed.Kind == VideoKind.Iframe)
+                    {
+                        <iframe src="@embed.Url" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                    }
+                    else if (embed.Kind == VideoKind.File)
+                    {
+                        <video src="@embed.Url" controls></video>
+                    }
+                    else
+                    {
+                        <div style="display:flex;align-items:center;justify-content:center;height:100%">
+                            <a href="@video.URL" target="_blank" rel="noopener" style="color:#fff">Open video ↗</a>
+                        </div>
+                    }
+                </div>
+                <div class="flex-between">
+                    <div style="font-weight:600">@video.Title</div>
+                    <div class="flex gap-8">
+                        <a asp-action="Edit" asp-route-id="@video.ID" class="btn btn-outline btn-sm">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@video.ID" class="btn btn-danger btn-sm">Del</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

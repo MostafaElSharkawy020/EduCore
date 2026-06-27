@@ -1,0 +1,37 @@
+@model EduCore.Models.Exam
+@{
+    var course = (EduCore.Models.Course)ViewBag.Course;
+    ViewData["Title"] = "Edit Exam";
+}
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-action="Index" asp-route-courseId="@course.ID" style="color:var(--accent2);text-decoration:none">Exams</a>
+        <span style="margin:0 8px">›</span>
+        <span>Edit Exam</span>
+    </nav>
+    <h1 class="page-title">Edit Exam</h1>
+    <p class="page-subtitle">Update this exam for "@course.Name"</p>
+</div>
+
+<form method="post">
+    <div asp-validation-summary="All" style="color:#ef4444;margin-bottom:12px"></div>
+    <input type="hidden" asp-for="ID" />
+    <input type="hidden" asp-for="CourseID" />
+
+    <div class="card" style="max-width:560px">
+        <div class="form-group">
+            <label class="form-label" asp-for="Title">Exam Title <span style="color:#ef4444">*</span></label>
+            <input class="form-input" asp-for="Title" />
+            <span asp-validation-for="Title" style="color:#ef4444;font-size:.8rem"></span>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+            <a asp-action="Index" asp-route-courseId="@course.ID" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-accent">Save Changes</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

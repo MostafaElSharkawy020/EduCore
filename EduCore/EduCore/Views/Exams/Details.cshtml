@@ -1,0 +1,51 @@
+@model EduCore.Models.Exam
+@{
+    ViewData["Title"] = Model.Title;
+    var items = Model.ExamQuestions.ToList();
+}
+
+<div class="page-header flex-between">
+    <div>
+        <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+            <a asp-action="Index" asp-route-courseId="@Model.CourseID" style="color:var(--accent2);text-decoration:none">Exams</a>
+            <span style="margin:0 8px">›</span>
+            <span>@Model.Title</span>
+        </nav>
+        <h1 class="page-title">@Model.Title</h1>
+        <p class="page-subtitle">@items.Count question@(items.Count == 1 ? "" : "s") · Course: @Model.Course.Name</p>
+    </div>
+    <a asp-controller="ExamQuestions" asp-action="Create" asp-route-examId="@Model.ID" class="btn btn-accent">+ Add Question</a>
+</div>
+
+@if (items.Count == 0)
+{
+    <div class="alert alert-info">
+        This exam has no questions yet. Click <strong>+ Add Question</strong> to add the first one.
+    </div>
+}
+else
+{
+    @for (int i = 0; i < items.Count; i++)
+    {
+        var question = items[i].Question;
+        <div class="card" style="margin-bottom:14px">
+            <div class="flex-between" style="margin-bottom:12px">
+                <div style="font-weight:700">Q@(i + 1). @question.QuestionText</div>
+                <div class="flex gap-8">
+                    <a asp-controller="ExamQuestions" asp-action="Edit" asp-route-id="@question.ID" class="btn btn-outline btn-sm">Edit</a>
+                    <a asp-controller="ExamQuestions" asp-action="Delete" asp-route-id="@question.ID" class="btn btn-danger btn-sm">Del</a>
+                </div>
+            </div>
+            @foreach (var choice in question.Choices.OrderBy(c => c.ID))
+            {
+                <div class="choice-item @(choice.IsCorrect ? "correct" : "")" style="cursor:default">
+                    <span>@choice.Text</span>
+                    @if (choice.IsCorrect)
+                    {
+                        <span class="badge badge-green" style="margin-left:auto">Correct</span>
+                    }
+                </div>
+            }
+        </div>
+    }
+}

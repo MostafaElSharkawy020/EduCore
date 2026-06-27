@@ -1,0 +1,37 @@
+@model EduCore.ViewModels.ExamQuestionFormViewModel
+@{
+    var exam = (EduCore.Models.Exam)ViewBag.Exam;
+}
+
+<form method="post">
+    <div asp-validation-summary="All" style="color:#ef4444;margin-bottom:12px"></div>
+    <input type="hidden" asp-for="ID" />
+    <input type="hidden" asp-for="ExamId" />
+
+    <div class="card" style="max-width:680px">
+        <div class="form-group">
+            <label class="form-label" asp-for="QuestionText">Question Text <span style="color:#ef4444">*</span></label>
+            <textarea class="form-textarea" asp-for="QuestionText" rows="2" placeholder="Type the question…"></textarea>
+            <span asp-validation-for="QuestionText" style="color:#ef4444;font-size:.8rem"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" asp-for="ChoicesText">Answer Choices <span style="color:#ef4444">*</span></label>
+            <textarea class="form-textarea" asp-for="ChoicesText" rows="5" placeholder="One choice per line, e.g.&#10;Paris&#10;London&#10;Rome"></textarea>
+            <span asp-validation-for="ChoicesText" style="color:#ef4444;font-size:.8rem"></span>
+            <div class="form-hint">Enter 2–5 choices, one per line.</div>
+        </div>
+
+        <div class="form-group" style="max-width:260px">
+            <label class="form-label" asp-for="CorrectNumber">Correct choice number <span style="color:#ef4444">*</span></label>
+            <input class="form-input" asp-for="CorrectNumber" type="number" min="1" max="5" />
+            <span asp-validation-for="CorrectNumber" style="color:#ef4444;font-size:.8rem"></span>
+            <div class="form-hint">e.g. 2 means the second line is the correct answer.</div>
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+            <a asp-controller="Exams" asp-action="Details" asp-route-id="@exam.ID" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-accent">Save Question</button>
+        </div>
+    </div>
+</form>

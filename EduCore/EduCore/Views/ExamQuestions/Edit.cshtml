@@ -1,0 +1,21 @@
+@model EduCore.ViewModels.ExamQuestionFormViewModel
+@{
+    var exam = (EduCore.Models.Exam)ViewBag.Exam;
+    ViewData["Title"] = "Edit Question";
+}
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-controller="Exams" asp-action="Details" asp-route-id="@exam.ID" style="color:var(--accent2);text-decoration:none">@exam.Title</a>
+        <span style="margin:0 8px">›</span>
+        <span>Edit Question</span>
+    </nav>
+    <h1 class="page-title">Edit Question</h1>
+    <p class="page-subtitle">Update this question in "@exam.Title"</p>
+</div>
+
+<partial name="_ExamQuestionForm" model="Model" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

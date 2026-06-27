@@ -1,0 +1,21 @@
+@model EduCore.Models.Video
+@{
+    var cls = (EduCore.Models.Class)ViewBag.Class;
+    ViewData["Title"] = "Add Video";
+}
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-action="Index" asp-route-classId="@cls.ID" style="color:var(--accent2);text-decoration:none">Videos</a>
+        <span style="margin:0 8px">›</span>
+        <span>Add Video</span>
+    </nav>
+    <h1 class="page-title">Add Video</h1>
+    <p class="page-subtitle">Add a lecture video to "@cls.Name"</p>
+</div>
+
+<partial name="_VideoForm" model="Model" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
