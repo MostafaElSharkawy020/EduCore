@@ -1,0 +1,97 @@
+@model EduCore.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Sign Up";
+    Layout = "_AuthLayout";
+}
+
+<style>
+    .pw-wrap { position:relative; }
+    .pw-toggle {
+        position:absolute; right:8px; top:50%; transform:translateY(-50%);
+        background:none; border:none; cursor:pointer; font-size:1.05rem; line-height:1;
+    }
+</style>
+
+<div class="auth-wrap">
+    <div class="auth-left">
+        <div class="auth-art">
+            <div class="auth-tagline">Start Today</div>
+            <h1>Begin Your<br>Learning Story</h1>
+            <p>Create your free account in minutes. Choose whether you're joining as a student or a teacher.</p>
+        </div>
+    </div>
+
+    <div class="auth-right" style="overflow-y:auto">
+        <a asp-controller="Home" asp-action="Index" class="topnav-brand"
+           style="font-size:1.4rem;display:block;margin-bottom:24px;text-decoration:none;color:var(--primary)">
+            Edu<span style="color:var(--accent)">Core</span>
+        </a>
+        <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:4px">Create Account</h2>
+        <p style="color:var(--text-muted);font-size:.88rem;margin-bottom:24px">
+            <a asp-action="Login" style="color:var(--accent2);text-decoration:none">Already have an account?</a>
+        </p>
+
+        <form method="post" asp-action="Register">
+            <div asp-validation-summary="ModelOnly" class="alert alert-error"
+                 style="@(ViewData.ModelState.IsValid ? "display:none" : "")"></div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label" asp-for="FName">First Name</label>
+                    <input class="form-input" asp-for="FName" placeholder="Alex" />
+                    <span asp-validation-for="FName" style="color:#ef4444;font-size:.8rem"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" asp-for="LName">Last Name</label>
+                    <input class="form-input" asp-for="LName" placeholder="Johnson" />
+                    <span asp-validation-for="LName" style="color:#ef4444;font-size:.8rem"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Email">Email Address</label>
+                <input class="form-input" asp-for="Email" placeholder="alex@example.com" />
+                <span asp-validation-for="Email" style="color:#ef4444;font-size:.8rem"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="PhoneNumber">Phone Number</label>
+                <input class="form-input" asp-for="PhoneNumber" placeholder="+20 100 000 0000" />
+                <span asp-validation-for="PhoneNumber" style="color:#ef4444;font-size:.8rem"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Role">I am a</label>
+                <select class="form-select" asp-for="Role">
+                    <option value="Student">Student</option>
+                    <option value="Teacher">Teacher</option>
+                </select>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label" asp-for="Password">Password</label>
+                    <div class="pw-wrap">
+                        <input class="form-input" asp-for="Password" type="password" placeholder="At least 6 characters" style="padding-right:44px" />
+                        <button type="button" class="pw-toggle" aria-label="Show password" onclick="togglePw('Password', this)">👁️</button>
+                    </div>
+                    <span asp-validation-for="Password" style="color:#ef4444;font-size:.8rem"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" asp-for="ConfirmPassword">Confirm Password</label>
+                    <div class="pw-wrap">
+                        <input class="form-input" asp-for="ConfirmPassword" type="password" placeholder="Repeat password" style="padding-right:44px" />
+                        <button type="button" class="pw-toggle" aria-label="Show password" onclick="togglePw('ConfirmPassword', this)">👁️</button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" style="color:#ef4444;font-size:.8rem"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-accent btn-full" style="padding:11px;margin-top:8px">Create Account</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

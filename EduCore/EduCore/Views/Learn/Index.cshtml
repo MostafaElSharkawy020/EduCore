@@ -1,0 +1,65 @@
+@model IEnumerable<EduCore.Models.Course>
+@{
+    ViewData["Title"] = "My Courses";
+    var fullName = User.Identity?.Name ?? "";
+    var firstName = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "there";
+    var totalClasses = Model.Sum(c => c.Classes.Count);
+}
+
+<style>
+    .welcome-banner { background:linear-gradient(135deg, var(--primary) 0%, #2d3566 100%); border-radius:16px; padding:32px 36px; color:#fff; margin-bottom:28px; }
+    .welcome-banner h1 { font-size:1.8rem; color:#fff; }
+</style>
+
+<div class="welcome-banner">
+    <div class="topnav-role" style="color:rgba(255,255,255,.5);margin-bottom:8px">DASHBOARD</div>
+    <h1>Welcome, @firstName 👋</h1>
+    <p style="color:rgba(255,255,255,.65);margin-top:6px">
+        @(Model.Any() ? $"You're enrolled in {Model.Count()} course{(Model.Count() == 1 ? "" : "s")}. Keep learning!" : "You haven't enrolled in any courses yet.")
+    </p>
+</div>
+
+<div class="grid-4" style="margin-bottom:28px">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#eff3ff">📚</div>
+        <div class="stat-value">@Model.Count()</div>
+        <div class="stat-label">Enrolled Courses</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4">📹</div>
+        <div class="stat-value">@totalClasses</div>
+        <div class="stat-label">Total Classes</div>
+    </div>
+</div>
+
+<div class="flex-between mb-16">
+    <h2 style="font-size:1.25rem">My Courses</h2>
+    <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline btn-sm">Browse More</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You haven't enrolled in any courses yet.
+        <a asp-controller="Catalog" asp-action="Index" style="color:var(--accent2)">Browse courses</a> to get started.
+    </div>
+}
+else
+{
+    <div class="grid-3">
+        @foreach (var course in Model)
+        {
+            var teacherName = $"{course.Teacher?.FName} {course.Teacher?.LName}".Trim();
+            <a asp-action="Course" asp-route-id="@course.ID" class="course-card">
+                <div class="course-card-img">
+                    <svg width="48" height="48" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
+                </div>
+                <div class="course-card-body">
+                    <div class="course-card-title">@course.Name</div>
+                    <div class="course-card-meta">@(string.IsNullOrWhiteSpace(teacherName) ? "Instructor" : teacherName)</div>
+                    <div style="margin-top:10px;font-size:.82rem;color:var(--text-muted)">@course.Classes.Count classes</div>
+                </div>
+            </a>
+        }
+    </div>
+}

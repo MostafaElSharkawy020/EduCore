@@ -1,0 +1,61 @@
+@model EduCore.ViewModels.TakeAssessmentViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var label = Model.IsExam ? "Exam" : "Quiz";
+    var backAction = Model.IsExam ? "Course" : "Class";
+}
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-controller="Learn" asp-action="@backAction" asp-route-id="@Model.BackId" style="color:var(--accent2);text-decoration:none">Back</a>
+        <span style="margin:0 8px">›</span>
+        <span>@label</span>
+    </nav>
+    <h1 class="page-title">@Model.Title</h1>
+    <p class="page-subtitle">@Model.Questions.Count question@(Model.Questions.Count == 1 ? "" : "s") · Choose one answer per question</p>
+</div>
+
+@if (!Model.Questions.Any())
+{
+    <div class="alert alert-info">This @label.ToLower() has no questions yet.</div>
+}
+else
+{
+    <form method="post" asp-action="@(Model.IsExam ? "SubmitExam" : "SubmitQuiz")">
+        <input type="hidden" name="@(Model.IsExam ? "examId" : "quizId")" value="@Model.AssessmentId" />
+
+        @for (int i = 0; i < Model.Questions.Count; i++)
+        {
+            var q = Model.Questions[i];
+            <div class="question-card">
+                <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px">
+                    Question @(i + 1) of @Model.Questions.Count
+                </div>
+                <p style="font-weight:600;margin-bottom:14px">@q.Text</p>
+                @foreach (var c in q.Choices)
+                {
+                    <label class="choice-item" style="cursor:pointer">
+                        <input type="radio" name="Answers[@q.QuestionId]" value="@c.ChoiceId" style="margin-right:6px" />
+                        <span>@c.Text</span>
+                    </label>
+                }
+            </div>
+        }
+
+        <button type="submit" class="btn btn-primary" style="padding:11px 28px">Submit @label</button>
+    </form>
+}
+
+@section Scripts {
+    <script>
+        // Highlight the selected choice
+        document.querySelectorAll('.choice-item input[type=radio]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                document.querySelectorAll('input[name="' + radio.name + '"]').forEach(function (r) {
+                    r.closest('.choice-item').classList.remove('selected');
+                });
+                radio.closest('.choice-item').classList.add('selected');
+            });
+        });
+    </script>
+}

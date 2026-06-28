@@ -22,11 +22,15 @@ namespace EduCore.Helpers
 
             var youTubeId = Match(url, @"(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)([\w-]{11})");
             if (youTubeId != null)
-                return new VideoEmbed(VideoKind.Iframe, $"https://www.youtube.com/embed/{youTubeId}");
+                // nocookie + modestbranding + rel=0 minimises YouTube branding and related/share overlays
+                return new VideoEmbed(VideoKind.Iframe,
+                    $"https://www.youtube-nocookie.com/embed/{youTubeId}?rel=0&modestbranding=1");
 
             var vimeoId = Match(url, @"vimeo\.com/(?:video/)?(\d+)");
             if (vimeoId != null)
-                return new VideoEmbed(VideoKind.Iframe, $"https://player.vimeo.com/video/{vimeoId}");
+                // title/byline/portrait off removes the Vimeo title and share/author overlays
+                return new VideoEmbed(VideoKind.Iframe,
+                    $"https://player.vimeo.com/video/{vimeoId}?title=0&byline=0&portrait=0");
 
             if (url.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
                 url.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ||

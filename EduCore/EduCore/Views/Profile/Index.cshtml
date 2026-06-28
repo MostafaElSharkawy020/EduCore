@@ -1,0 +1,48 @@
+@model EduCore.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<partial name="_ProfileHero" />
+
+<div class="grid-2">
+    <div class="card">
+        <h3 style="font-size:1rem;margin-bottom:18px;font-weight:700">Personal Details</h3>
+        <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="flex-between">
+                <span class="text-muted text-sm">First Name</span>
+                <span style="font-weight:500">@Model.FName</span>
+            </div>
+            <hr class="divider" style="margin:0">
+            <div class="flex-between">
+                <span class="text-muted text-sm">Last Name</span>
+                <span style="font-weight:500">@Model.LName</span>
+            </div>
+            <hr class="divider" style="margin:0">
+            <div class="flex-between">
+                <span class="text-muted text-sm">Email</span>
+                <span style="font-weight:500">@Model.Email</span>
+            </div>
+            <hr class="divider" style="margin:0">
+            <div class="flex-between">
+                <span class="text-muted text-sm">Phone</span>
+                <span style="font-weight:500">@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "—" : Model.PhoneNumber)</span>
+            </div>
+            <hr class="divider" style="margin:0">
+            <div class="flex-between">
+                <span class="text-muted text-sm">Role</span>
+                <span style="font-weight:500">@Model.Role</span>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.IsTeacher)
+    {
+        <div class="card">
+            <h3 style="font-size:1rem;margin-bottom:14px;font-weight:700">Biography</h3>
+            <p class="text-muted" style="line-height:1.7;font-size:.9rem">
+                @(string.IsNullOrWhiteSpace(Model.Biography) ? "No biography added yet." : Model.Biography)
+            </p>
+        </div>
+    }
+</div>

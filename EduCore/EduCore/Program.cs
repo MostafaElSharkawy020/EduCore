@@ -1,5 +1,6 @@
 using System.Globalization;
 using EduCore.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 namespace EduCore
@@ -25,6 +26,17 @@ namespace EduCore
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Cookie-based authentication (custom, against the Teachers/Students tables)
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.LogoutPath = "/Account/Logout";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                    options.SlidingExpiration = true;
+                });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -38,6 +50,7 @@ namespace EduCore
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();

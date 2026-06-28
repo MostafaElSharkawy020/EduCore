@@ -1,0 +1,52 @@
+@model EduCore.ViewModels.AssessmentResultViewModel
+@{
+    ViewData["Title"] = Model.Title + " — Result";
+    var label = Model.IsExam ? "Exam" : "Quiz";
+    var backAction = Model.IsExam ? "Course" : "Class";
+    var pct = Model.Total > 0 ? (int)Math.Round(100.0 * Model.Score / Model.Total) : 0;
+    var passed = pct >= 50;
+}
+
+<div class="page-header">
+    <h1 class="page-title">@Model.Title</h1>
+    <p class="page-subtitle">@label result</p>
+</div>
+
+<div class="card" style="text-align:center;margin-bottom:20px">
+    <div style="font-size:2.6rem;font-weight:700;font-family:'Playfair Display',serif;color:@(passed ? "#22c55e" : "var(--accent)")">
+        @Model.Score / @Model.Total
+    </div>
+    <div class="text-muted">@pct% correct</div>
+    <div style="margin-top:14px;display:flex;gap:12px;justify-content:center">
+        <a asp-action="@(Model.IsExam ? "Exam" : "Quiz")" asp-route-id="@Model.AssessmentId" class="btn btn-outline btn-sm">Retake</a>
+        <a asp-controller="Learn" asp-action="@backAction" asp-route-id="@Model.BackId" class="btn btn-primary btn-sm">
+            Back to @(Model.IsExam ? "course" : "class")
+        </a>
+    </div>
+</div>
+
+@for (int i = 0; i < Model.Items.Count; i++)
+{
+    var item = Model.Items[i];
+    <div class="question-card">
+        <p style="font-weight:600;margin-bottom:12px">
+            <span style="color:@(item.IsCorrect ? "#22c55e" : "#ef4444")">@(item.IsCorrect ? "✓" : "✗")</span>
+            Q@(i + 1). @item.QuestionText
+        </p>
+        @foreach (var c in item.Choices)
+        {
+            var cls = c.IsCorrect ? "correct" : (c.IsSelected ? "wrong" : "");
+            <div class="choice-item @cls" style="cursor:default">
+                <span>@c.Text</span>
+                @if (c.IsCorrect)
+                {
+                    <span class="badge badge-green" style="margin-left:auto">Correct answer</span>
+                }
+                else if (c.IsSelected)
+                {
+                    <span class="badge badge-accent" style="margin-left:auto">Your answer</span>
+                }
+            </div>
+        }
+    </div>
+}

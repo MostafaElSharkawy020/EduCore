@@ -1,18 +1,21 @@
 using EduCore.Data;
+using EduCore.Helpers;
 using EduCore.Models;
 using EduCore.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EduCore.Controllers
 {
     // Manages the questions inside an exam (each question = text + 2-5 choices, one correct).
+    [Authorize(Roles = "Teacher")]
     public class ExamQuestionsController : Controller
     {
         private readonly AppDbContext _context;
 
-        // TODO: replace with the logged-in teacher's ID once authentication exists.
-        private const int CurrentTeacherId = 1;
+        // The signed-in teacher's id (from the auth cookie).
+        private int CurrentTeacherId => User.GetUserId();
 
         public ExamQuestionsController(AppDbContext context)
         {

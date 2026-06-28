@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "_AuthLayout";
+}
+
+<div class="auth-wrap">
+    <div class="auth-right" style="margin:auto;text-align:center">
+        <div style="font-size:3rem;margin-bottom:12px">🚫</div>
+        <h2 style="font-size:1.6rem;font-weight:700;margin-bottom:8px">Access Denied</h2>
+        <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:24px">
+            You don't have permission to view this page.
+        </p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Back to Home</a>
+    </div>
+</div>

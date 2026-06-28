@@ -1,0 +1,149 @@
+@model EduCore.Models.Course
+@{
+    ViewData["Title"] = Model.Name;
+    bool isEnrolled = (bool)(ViewBag.IsEnrolled ?? false);
+    var teacher = Model.Teacher;
+    var teacherName = teacher == null ? "Instructor" : $"{teacher.FName} {teacher.LName}".Trim();
+    string Init(string? a, string? b) =>
+        $"{(string.IsNullOrEmpty(a) ? "" : a[0].ToString())}{(string.IsNullOrEmpty(b) ? "" : b[0].ToString())}".ToUpper();
+    var initials = teacher == null ? "T" : Init(teacher.FName, teacher.LName);
+    var classes = Model.Classes.OrderBy(c => c.ID).ToList();
+}
+
+<style>
+    .course-hero { background:linear-gradient(135deg, var(--primary) 0%, #2d3566 100%); border-radius:16px; padding:40px; color:#fff; margin-bottom:24px; }
+    .course-hero h1 { font-size:2rem; color:#fff; margin-bottom:10px; }
+    .teacher-row { display:flex; align-items:center; gap:12px; margin-top:18px; }
+    .teacher-avatar { width:40px; height:40px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:.85rem; }
+    .course-meta-bar { display:flex; gap:24px; margin-top:18px; flex-wrap:wrap; }
+    .meta-item { display:flex; align-items:center; gap:6px; color:rgba(255,255,255,.75); font-size:.85rem; }
+    .price-card { background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:24px; position:sticky; top:calc(var(--nav-h) + 20px); box-shadow:var(--shadow-lg); }
+    .price-big { font-size:2rem; font-weight:700; color:var(--primary); font-family:'Playfair Display',serif; }
+    .class-item { display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); }
+    .class-item:last-child { border-bottom:none; }
+    .class-num { width:32px; height:32px; border-radius:8px; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; color:var(--text-muted); flex-shrink:0; }
+    .layout-cols { display:grid; grid-template-columns:1fr 320px; gap:28px; align-items:start; }
+    @@media(max-width:900px){ .layout-cols { grid-template-columns:1fr; } .price-card { position:static; } }
+</style>
+
+<nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px">
+    <a asp-action="Index" style="color:var(--accent2);text-decoration:none">Courses</a>
+    <span style="margin:0 8px">›</span>
+    <span>@Model.Name</span>
+</nav>
+
+@if (TempData["CatalogMessage"] != null)
+{
+    <div class="alert alert-warning">@TempData["CatalogMessage"]</div>
+}
+
+<div class="layout-cols">
+    <!-- LEFT -->
+    <div>
+        <div class="course-hero">
+            <h1>@Model.Name</h1>
+            <div class="teacher-row">
+                <div class="teacher-avatar">@initials</div>
+                <div>
+                    <div style="font-weight:600;font-size:.9rem">@teacherName</div>
+                    <div style="font-size:.78rem;color:rgba(255,255,255,.55)">Course Instructor</div>
+                </div>
+            </div>
+            <div class="course-meta-bar">
+                <div class="meta-item">📚 @classes.Count Classes</div>
+                <div class="meta-item">👥 @Model.StudentCourses.Count Students</div>
+                <div class="meta-item">📝 @Model.Exams.Count Exams</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+            <h3 style="font-size:1rem;margin-bottom:12px;font-weight:700">About the Instructor</h3>
+            <p style="font-size:.9rem;color:var(--text-muted);line-height:1.7">
+                @(string.IsNullOrWhiteSpace(teacher?.Biography) ? "No biography provided yet." : teacher!.Biography)
+            </p>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+            <h3 style="font-size:1rem;margin-bottom:14px;font-weight:700">Course Classes</h3>
+            @if (!classes.Any())
+            {
+                <p style="font-size:.9rem;color:var(--text-muted)">No classes have been added yet.</p>
+            }
+            else
+            {
+                @for (int i = 0; i < classes.Count; i++)
+                {
+                    <div class="class-item">
+                        <div class="class-num">@(i + 1)</div>
+                        <div style="flex:1">
+                            <div style="font-weight:500;font-size:.9rem">@classes[i].Name</div>
+                            <div style="font-size:.78rem;color:var(--text-muted)">Video · PDF · Quiz</div>
+                        </div>
+                        @if (isEnrolled)
+                        {
+                            <span style="font-size:.78rem;color:#22c55e;font-weight:600">Included</span>
+                        }
+                        else
+                        {
+                            <span style="font-size:.75rem;color:var(--text-muted)">🔒 Enroll to unlock</span>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="card">
+            <h3 style="font-size:1rem;margin-bottom:14px;font-weight:700">Course Exams</h3>
+            @if (!Model.Exams.Any())
+            {
+                <p style="font-size:.9rem;color:var(--text-muted)">No exams have been added yet.</p>
+            }
+            else
+            {
+                @foreach (var exam in Model.Exams)
+                {
+                    <div class="class-item">
+                        <div style="flex:1;font-weight:600">@exam.Title</div>
+                        @if (!isEnrolled)
+                        {
+                            <span style="font-size:.75rem;color:var(--text-muted)">🔒 Enroll to access</span>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- RIGHT: price card -->
+    <div>
+        <div class="price-card">
+            <div class="price-big">@Model.Price.ToString("C")</div>
+            <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:20px">One-time payment · Lifetime access</div>
+
+            @if (isEnrolled)
+            {
+                <div class="alert alert-success" style="text-align:center;margin-bottom:12px">✓ You're enrolled</div>
+                <a asp-controller="Learn" asp-action="Course" asp-route-id="@Model.ID" class="btn btn-primary btn-full" style="padding:13px;font-size:1rem">Go to Course →</a>
+            }
+            else if (Model.Enrollable)
+            {
+                <form method="post" asp-action="Enroll">
+                    <input type="hidden" name="courseId" value="@Model.ID" />
+                    <button type="submit" class="btn btn-accent btn-full" style="padding:13px;font-size:1rem">Enroll Now (Free)</button>
+                </form>
+            }
+            else
+            {
+                <button class="btn btn-outline btn-full" disabled>Enrollment closed</button>
+            }
+
+            <hr class="divider">
+            <div style="font-size:.82rem;color:var(--text-muted);display:flex;flex-direction:column;gap:8px">
+                <div class="flex-center gap-8">✓ @classes.Count classes included</div>
+                <div class="flex-center gap-8">✓ Downloadable resources</div>
+                <div class="flex-center gap-8">✓ Access on all devices</div>
+            </div>
+        </div>
+    </div>
+</div>
+

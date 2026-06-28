@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sign Up — EduArc</title>
+<title>Sign Up — EduCore</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <style>
@@ -265,7 +265,7 @@ function createAccount() {
     lname: document.getElementById('lname').value,
     email: document.getElementById('email').value, role: 'student',
     phone: document.getElementById('phone').value,
-    biography: 'New student on EduArc.'
+    biography: 'New student on EduCore.'
   };
   sessionStorage.setItem('cms_user', JSON.stringify(user));
   window.location.href = 'all-courses.html';

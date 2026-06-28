@@ -1,16 +1,19 @@
 using EduCore.Data;
+using EduCore.Helpers;
 using EduCore.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EduCore.Controllers
 {
+    [Authorize(Roles = "Teacher")]
     public class VideosController : Controller
     {
         private readonly AppDbContext _context;
 
-        // TODO: replace with the logged-in teacher's ID once authentication exists.
-        private const int CurrentTeacherId = 1;
+        // The signed-in teacher's id (from the auth cookie).
+        private int CurrentTeacherId => User.GetUserId();
 
         public VideosController(AppDbContext context)
         {

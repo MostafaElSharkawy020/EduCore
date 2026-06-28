@@ -1,0 +1,59 @@
+@model EduCore.ViewModels.EditProfileViewModel
+@{
+    ViewData["Title"] = "Edit Profile";
+    bool isTeacher = User.IsInRole("Teacher");
+}
+
+<partial name="_ProfileHero" />
+
+<form method="post" asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="alert alert-error"
+         style="@(ViewData.ModelState.IsValid ? "display:none" : "")"></div>
+
+    <div class="card" style="max-width:600px">
+        <h3 style="font-size:1rem;margin-bottom:20px;font-weight:700">Edit Personal Information</h3>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label class="form-label" asp-for="FName">First Name</label>
+                <input class="form-input" asp-for="FName" />
+                <span asp-validation-for="FName" style="color:#ef4444;font-size:.8rem"></span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" asp-for="LName">Last Name</label>
+                <input class="form-input" asp-for="LName" />
+                <span asp-validation-for="LName" style="color:#ef4444;font-size:.8rem"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" asp-for="Email">Email Address</label>
+            <input class="form-input" asp-for="Email" />
+            <span asp-validation-for="Email" style="color:#ef4444;font-size:.8rem"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" asp-for="PhoneNumber">Phone Number</label>
+            <input class="form-input" asp-for="PhoneNumber" placeholder="+20 100 000 0000" />
+            <span asp-validation-for="PhoneNumber" style="color:#ef4444;font-size:.8rem"></span>
+        </div>
+
+        @if (isTeacher)
+        {
+            <div class="form-group">
+                <label class="form-label" asp-for="Biography">Biography</label>
+                <textarea class="form-textarea" asp-for="Biography" rows="4" placeholder="Tell students about yourself…"></textarea>
+                <span asp-validation-for="Biography" style="color:#ef4444;font-size:.8rem"></span>
+            </div>
+        }
+
+        <div style="display:flex;gap:12px">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a asp-action="Index" class="btn btn-outline">Cancel</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

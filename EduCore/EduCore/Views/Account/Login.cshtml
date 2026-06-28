@@ -1,0 +1,86 @@
+@model EduCore.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_AuthLayout";
+}
+
+<style>
+    .role-tabs { display:flex; gap:8px; margin-bottom:22px; }
+    .role-tab {
+        flex:1; padding:9px; border-radius:8px; border:1.5px solid var(--border);
+        background:transparent; font-family:'DM Sans',sans-serif; font-size:.85rem;
+        font-weight:600; cursor:pointer; transition:all .18s; color:var(--text-muted);
+    }
+    .role-tab.active { border-color:var(--accent2); background:#eff3ff; color:var(--accent2); }
+    .pw-wrap { position:relative; }
+    .pw-toggle {
+        position:absolute; right:8px; top:50%; transform:translateY(-50%);
+        background:none; border:none; cursor:pointer; font-size:1.05rem; line-height:1;
+    }
+</style>
+
+<div class="auth-wrap">
+    <div class="auth-left">
+        <div class="auth-art">
+            <div class="auth-tagline">EduCore Platform</div>
+            <h1>Where Knowledge<br>Meets Excellence</h1>
+            <p>Sign in to continue. Teachers manage courses, classes, videos, quizzes and exams; students learn and take assessments.</p>
+        </div>
+    </div>
+
+    <div class="auth-right">
+        <a asp-controller="Home" asp-action="Index" class="topnav-brand"
+           style="font-size:1.5rem;display:block;margin-bottom:32px;text-decoration:none;color:var(--primary)">
+            Edu<span style="color:var(--accent)">Core</span>
+        </a>
+        <h2 style="font-size:1.7rem;font-weight:700;margin-bottom:6px">Welcome back</h2>
+        <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:28px">Sign in to your account</p>
+
+        <form method="post" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+            <div asp-validation-summary="ModelOnly" class="alert alert-error"
+                 style="@(ViewData.ModelState.IsValid ? "display:none" : "")"></div>
+
+            <!-- Role selector -->
+            <input type="hidden" asp-for="Role" id="Role" />
+            <div class="role-tabs">
+                <button type="button" class="role-tab @(Model.Role == "Teacher" ? "" : "active")"
+                        data-role="Student" onclick="selectRole(this)">Student</button>
+                <button type="button" class="role-tab @(Model.Role == "Teacher" ? "active" : "")"
+                        data-role="Teacher" onclick="selectRole(this)">Teacher</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Email">Email Address</label>
+                <input class="form-input" asp-for="Email" placeholder="you@example.com" />
+                <span asp-validation-for="Email" style="color:#ef4444;font-size:.8rem"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Password">Password</label>
+                <div class="pw-wrap">
+                    <input class="form-input" asp-for="Password" type="password" placeholder="••••••••" style="padding-right:44px" />
+                    <button type="button" class="pw-toggle" aria-label="Show password" onclick="togglePw('Password', this)">👁️</button>
+                </div>
+                <span asp-validation-for="Password" style="color:#ef4444;font-size:.8rem"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" style="padding:12px;margin-top:6px">Sign In</button>
+        </form>
+
+        <div style="text-align:center;margin-top:24px;font-size:.88rem;color:var(--text-muted)">
+            Don't have an account?
+            <a asp-action="Register" style="color:var(--accent2);font-weight:600;text-decoration:none">Sign up</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function selectRole(btn) {
+            document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('Role').value = btn.dataset.role;
+        }
+    </script>
+}

@@ -1,0 +1,140 @@
+@model EduCore.Models.Class
+@{
+    ViewData["Title"] = Model.Name;
+    var course = Model.Course;
+    var siblings = course.Classes.OrderBy(c => c.ID).ToList();
+    var videos = Model.Videos.ToList();
+    var quizScores = ViewBag.QuizScores as Dictionary<int, QuizAttempt>;
+}
+
+<style>
+    .class-layout { display:grid; grid-template-columns:1fr 300px; gap:24px; align-items:start; }
+    @@media(max-width:900px){ .class-layout { grid-template-columns:1fr; } }
+    .resources-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+    .resource-card { display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:10px; border:1.5px solid var(--border); background:var(--surface2); text-decoration:none; color:var(--text); font-size:.88rem; font-weight:500; transition:all .18s; }
+    .resource-card:hover { border-color:var(--accent2); background:#eff3ff; color:var(--accent2); }
+    .class-nav-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; transition:all .18s; margin-bottom:4px; text-decoration:none; color:var(--text); }
+    .class-nav-item:hover { background:var(--surface); }
+    .class-nav-item.active { background:#eff3ff; color:var(--accent2); }
+    .class-num-sm { width:28px; height:28px; border-radius:6px; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; flex-shrink:0; }
+    .active .class-num-sm { background:var(--accent2); color:#fff; }
+</style>
+
+<nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:14px">
+    <a asp-action="Index" style="color:var(--accent2);text-decoration:none">My Courses</a>
+    <span style="margin:0 8px">›</span>
+    <a asp-action="Course" asp-route-id="@course.ID" style="color:var(--accent2);text-decoration:none">@course.Name</a>
+    <span style="margin:0 8px">›</span>
+    <span>@Model.Name</span>
+</nav>
+
+<div class="class-layout">
+    <!-- MAIN -->
+    <div>
+        <!-- Videos -->
+        @if (!videos.Any())
+        {
+            <div class="card" style="margin-bottom:20px">
+                <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:6px">@Model.Name</h2>
+                <p style="font-size:.88rem;color:var(--text-muted)">No video has been added to this class yet.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var video in videos)
+            {
+                var embed = VideoEmbedHelper.Resolve(video.URL);
+                <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px">
+                    <div class="video-container">
+                        @if (embed.Kind == VideoKind.Iframe)
+                        {
+                            <iframe src="@embed.Url" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                        }
+                        else if (embed.Kind == VideoKind.File)
+                        {
+                            <video src="@embed.Url" controls></video>
+                        }
+                        else
+                        {
+                            <div style="display:flex;align-items:center;justify-content:center;height:100%">
+                                <a href="@video.URL" target="_blank" rel="noopener" style="color:#fff">Open video ↗</a>
+                            </div>
+                        }
+                    </div>
+                    <div style="padding:16px 20px">
+                        <div style="font-weight:600">@video.Title</div>
+                    </div>
+                </div>
+            }
+        }
+
+        <!-- Resources -->
+        <div class="card" style="margin-bottom:20px">
+            <h3 style="font-size:1rem;font-weight:700;margin-bottom:4px">Class Resources</h3>
+            <p style="font-size:.82rem;color:var(--text-muted)">Materials for this class</p>
+            @if (string.IsNullOrWhiteSpace(Model.PDF) && string.IsNullOrWhiteSpace(Model.HomeworkPDF))
+            {
+                <p style="font-size:.85rem;color:var(--text-muted);margin-top:12px">No materials uploaded for this class.</p>
+            }
+            else
+            {
+                <div class="resources-row">
+                    @if (!string.IsNullOrWhiteSpace(Model.PDF))
+                    {
+                        <a href="@Model.PDF" target="_blank" rel="noopener" class="resource-card">📄 Lecture Notes PDF</a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.HomeworkPDF))
+                    {
+                        <a href="@Model.HomeworkPDF" target="_blank" rel="noopener" class="resource-card">📝 Homework PDF</a>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Quizzes -->
+        <div class="card">
+            <h3 style="font-size:1rem;font-weight:700;margin-bottom:14px">Class Quizzes</h3>
+            @if (!Model.Quizzes.Any())
+            {
+                <p style="font-size:.9rem;color:var(--text-muted)">No quizzes for this class yet.</p>
+            }
+            else
+            {
+                @foreach (var quiz in Model.Quizzes)
+                {
+                    var hasAttempt = quizScores != null && quizScores.TryGetValue(quiz.ID, out var attempt);
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+                        <div style="flex:1">
+                            <div style="font-weight:600;font-size:.9rem">@quiz.Title</div>
+                            <div style="font-size:.78rem;color:var(--text-muted)">@quiz.QuizQuestions.Count question@(quiz.QuizQuestions.Count == 1 ? "" : "s")</div>
+                        </div>
+                        @if (hasAttempt)
+                        {
+                            <span style="font-size:.78rem;color:var(--text-muted)">Last: @quizScores[quiz.ID].Score/@quizScores[quiz.ID].TotalQuestions</span>
+                        }
+                        <a asp-controller="Assessments" asp-action="Quiz" asp-route-id="@quiz.ID" class="btn btn-blue btn-sm">@(hasAttempt ? "Retake" : "Take Quiz")</a>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- SIDEBAR: class list -->
+    <div>
+        <div class="card" style="padding:16px">
+            <h3 style="font-size:.95rem;font-weight:700;margin-bottom:14px">Course Classes</h3>
+            @for (int i = 0; i < siblings.Count; i++)
+            {
+                var isCurrent = siblings[i].ID == Model.ID;
+                <a asp-action="Class" asp-route-id="@siblings[i].ID" class="class-nav-item @(isCurrent ? "active" : "")">
+                    <div class="class-num-sm">@(i + 1)</div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:.85rem;font-weight:@(isCurrent ? "600" : "500");white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@siblings[i].Name</div>
+                    </div>
+                </a>
+            }
+            <hr class="divider">
+            <a asp-action="Course" asp-route-id="@course.ID" class="btn btn-outline btn-sm btn-full">Back to course</a>
+        </div>
+    </div>
+</div>

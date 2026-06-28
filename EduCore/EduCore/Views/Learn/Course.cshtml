@@ -1,0 +1,79 @@
+@model EduCore.Models.Course
+@{
+    ViewData["Title"] = Model.Name;
+    var teacher = Model.Teacher;
+    var teacherName = teacher == null ? "Instructor" : $"{teacher.FName} {teacher.LName}".Trim();
+    var classes = Model.Classes.OrderBy(c => c.ID).ToList();
+    var examScores = ViewBag.ExamScores as Dictionary<int, ExamAttempt>;
+}
+
+<style>
+    .course-hero { background:linear-gradient(135deg, var(--primary) 0%, #2d3566 100%); border-radius:16px; padding:36px; color:#fff; margin-bottom:24px; }
+    .course-hero h1 { font-size:1.9rem; color:#fff; margin-bottom:10px; }
+    .course-meta-bar { display:flex; gap:24px; margin-top:14px; flex-wrap:wrap; }
+    .meta-item { color:rgba(255,255,255,.75); font-size:.85rem; }
+    .class-item { display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); }
+    .class-item:last-child { border-bottom:none; }
+    .class-num { width:32px; height:32px; border-radius:8px; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; color:var(--text-muted); flex-shrink:0; }
+</style>
+
+<nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px">
+    <a asp-action="Index" style="color:var(--accent2);text-decoration:none">My Courses</a>
+    <span style="margin:0 8px">›</span>
+    <span>@Model.Name</span>
+</nav>
+
+<div class="course-hero">
+    <span class="badge badge-green" style="margin-bottom:10px;display:inline-block">Enrolled</span>
+    <h1>@Model.Name</h1>
+    <div style="color:rgba(255,255,255,.7);font-size:.9rem">Instructor: @teacherName</div>
+    <div class="course-meta-bar">
+        <div class="meta-item">📹 @classes.Count Classes</div>
+        <div class="meta-item">📝 @Model.Exams.Count Exams</div>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+    <h3 style="font-size:1rem;margin-bottom:14px;font-weight:700">Classes</h3>
+    @if (!classes.Any())
+    {
+        <p style="font-size:.9rem;color:var(--text-muted)">No classes have been added to this course yet.</p>
+    }
+    else
+    {
+        @for (int i = 0; i < classes.Count; i++)
+        {
+            <div class="class-item">
+                <div class="class-num">@(i + 1)</div>
+                <div style="flex:1">
+                    <div style="font-weight:500;font-size:.9rem">@classes[i].Name</div>
+                    <div style="font-size:.78rem;color:var(--text-muted)">Video · PDF · Quiz</div>
+                </div>
+                <a asp-action="Class" asp-route-id="@classes[i].ID" class="btn btn-blue btn-sm">Open</a>
+            </div>
+        }
+    }
+</div>
+
+<div class="card">
+    <h3 style="font-size:1rem;margin-bottom:14px;font-weight:700">Course Exams</h3>
+    @if (!Model.Exams.Any())
+    {
+        <p style="font-size:.9rem;color:var(--text-muted)">No exams have been added to this course yet.</p>
+    }
+    else
+    {
+        @foreach (var exam in Model.Exams)
+        {
+            var hasAttempt = examScores != null && examScores.ContainsKey(exam.ID);
+            <div class="class-item">
+                <div style="flex:1;font-weight:600">@exam.Title</div>
+                @if (hasAttempt)
+                {
+                    <span style="font-size:.78rem;color:var(--text-muted);margin-right:6px">Last: @examScores[exam.ID].Score/@examScores[exam.ID].TotalQuestions</span>
+                }
+                <a asp-controller="Assessments" asp-action="Exam" asp-route-id="@exam.ID" class="btn btn-blue btn-sm">@(hasAttempt ? "Retake" : "Take Exam")</a>
+            </div>
+        }
+    }
+</div>

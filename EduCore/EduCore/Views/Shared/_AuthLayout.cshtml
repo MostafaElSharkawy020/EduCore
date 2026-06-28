@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — EduCore</title>
+    <link rel="stylesheet" href="~/css/shared.css" asp-append-version="true" />
+</head>
+<body>
+    @RenderBody()
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        function togglePw(id, btn) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            var show = el.type === 'password';
+            el.type = show ? 'text' : 'password';
+            btn.textContent = show ? '🙈' : '👁️';
+            btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

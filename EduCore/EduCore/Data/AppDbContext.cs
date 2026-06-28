@@ -25,6 +25,8 @@ namespace EduCore.Data
         public DbSet<ExamQuestion> ExamQuestions { get; set; }
         public DbSet<QuizQuestion> QuizQuestions { get; set; }
         public DbSet<StudentCourse> StudentCourses { get; set; }
+        public DbSet<QuizAttempt> QuizAttempts { get; set; }
+        public DbSet<ExamAttempt> ExamAttempts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +68,27 @@ namespace EduCore.Data
                 .HasForeignKey(ta => ta.AssistantID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // ── Attempt tables: each has two FKs, so disable cascade on the Student side ──
+            modelBuilder.Entity<QuizAttempt>()
+                .HasOne(a => a.Quiz).WithMany()
+                .HasForeignKey(a => a.QuizID).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<QuizAttempt>()
+                .HasOne(a => a.Student).WithMany()
+                .HasForeignKey(a => a.StudentID).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ExamAttempt>()
+                .HasOne(a => a.Exam).WithMany()
+                .HasForeignKey(a => a.ExamID).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ExamAttempt>()
+                .HasOne(a => a.Student).WithMany()
+                .HasForeignKey(a => a.StudentID).OnDelete(DeleteBehavior.Restrict);
+
+            // ── Unique email per account type (length-capped so the column can be indexed) ──
+            modelBuilder.Entity<Teacher>().Property(t => t.Email).HasMaxLength(256);
+            modelBuilder.Entity<Teacher>().HasIndex(t => t.Email).IsUnique();
+            modelBuilder.Entity<Student>().Property(s => s.Email).HasMaxLength(256);
+            modelBuilder.Entity<Student>().HasIndex(s => s.Email).IsUnique();
+
             // ── Seed a demo teacher (ID = 1) ──
             // Needed because we currently hardcode TeacherID = 1 in CoursesController.
             // TODO: remove once real teacher authentication / registration exists.
@@ -75,7 +98,8 @@ namespace EduCore.Data
                 FName = "Demo",
                 LName = "Teacher",
                 Email = "teacher@educore.local",
-                Password = "password",
+                // PBKDF2 hash of "Teacher@123" (see Helpers/PasswordHasher).
+                Password = "1OubmybQyMYpetU/JF2JNg==:PA3m0/NloaZJlG72BhRBEuwQJ6MTWxSx632tuVtGZ1E=",
                 PhoneNumber = "0000000000",
                 Biography = "Seeded demo teacher account for development."
             });

@@ -1,37 +1,34 @@
-# Teacher Course Management — TODO
+# EduCore — Project TODO
 
-Remaining features for the teacher-facing course management area.
-(Built so far: Courses CRUD, Classes CRUD — both with teacher ownership checks.)
+## Done
+- [x] EF Core data layer, migrations, SQL Server
+- [x] **Teacher:** Courses CRUD, Classes CRUD (ownership checks)
+- [x] **Teacher:** Videos, Quizzes (+ normalized Choice table), Exams
+- [x] **Auth:** cookie auth for teachers & students, PBKDF2 hashing, roles, per-table unique email, login role selector, show-password toggle
+- [x] **Profile** pages (teacher & student): view, edit, change password
+- [x] **Student:** browse catalog, course details
+- [x] **Student:** free enrollment, My Courses dashboard, view enrolled course + class content (videos, PDFs, quiz/exam lists)
+- [x] **Assessments:** taking quizzes & exams, auto-grading, saved attempts (QuizAttempt/ExamAttempt) + per-question feedback
 
-## Backlog
+## Pending action
+- [x] Apply the Phase 5 migration `AddAssessmentAttempts` — done; QuizAttempts/ExamAttempts tables exist and quiz attempts are persisting.
 
-- [ ] **Add Videos to a class**
-  - Model: `Video` (URL, Title, ClassID) — already exists.
-  - Likely a `VideosController` (or nested actions under a class) with Create/Edit/Delete.
-  - Ownership: a video belongs to a class → course → teacher (`Video.Class.Course.TeacherID`).
+## Remaining (not yet built)
+- [ ] **Teacher sees student results** — attempts are saved but teachers have no page to view them (who took each quiz/exam, scores, averages per quiz/exam/student).
+- [ ] **Teacher dashboard / home** — stats landing page (active courses, total students, etc.); teachers currently land on the Courses list.
 
-- [ ] **Add Quizzes to a class**
-  - Models: `Quiz` (Title, ClassID), `QuizQuestion` (QuizID, QuestionID), `Question` (QuestionText, CorrectAnswer, Choices) — all exist.
-  - Quiz editor: create a quiz under a class, then add questions.
-  - Ownership: `Quiz.Class.Course.TeacherID == currentTeacher`.
-  - Frontend reference: `frontend/editor-exam.html?type=quiz`.
+## Deferred by choice
+- [ ] **Payment & cards** — enrollment is free for now. Add `Card` management + a payment step before enrolling (and the Profile "Payment Card" tab).
+- [ ] **Paid-video protection** — currently only the enrollment gate; raw video URL is still shareable. Options: Vimeo domain-privacy links (no code) or a streaming provider with signed/expiring URLs (Bunny/Cloudflare Stream).
 
-- [ ] **Add Exams to a course**
-  - Models: `Exam` (Title, CourseID), `ExamQuestion` (ExamID, QuestionID), `Question` — all exist.
-  - Same pattern as quizzes but linked to a course instead of a class.
-  - Ownership: `Exam.Course.TeacherID == currentTeacher`.
-  - Frontend reference: `frontend/editor-exam.html?type=exam`.
+## Cleanup / nice-to-have
+- [ ] **Assistant role** — schema has `Assistant` + `TeacherAssistant`, but login/UI don't support assistants. Build only if required.
+- [ ] **Quiz/exam timers** — prototype showed countdown timers; not implemented.
+- [ ] Remove the seeded demo teacher (teacher@educore.local) once real teacher onboarding exists.
+- [x] Rename all "EduArc" → "EduCore" (done across frontend prototypes; MVC app already clean).
 
-- [ ] **View Class Data (Class Details page)**
-  - A read-only `Details` view for a class showing its videos, quizzes, and PDF links.
-  - Frontend reference: `frontend/class-view.html`.
-
-## Notes / conventions to follow (match the Courses/Classes work)
-- Hardcoded `CurrentTeacherId = 1` for now — swap for real auth later (one place per controller).
-- After any model change, run `Add-Migration <Name>` + `Update-Database` in the Package Manager Console.
-- Reference navigation properties trigger spurious "required" validation (Nullable enabled) — use `ModelState.Remove(nameof(X.NavProp))` in POST actions, as done in Courses/Classes.
-- Views use the `_EduCoreLayout` layout and `wwwroot/css/shared.css` design system.
-
-## Related deferred items (not part of this checklist, noted earlier)
-- [ ] Replace hardcoded `TeacherId` with the logged-in teacher once auth is built; remove the seeded demo teacher.
-- [ ] Finish renaming remaining "EduArc" references to "EduCore" (e.g. the `<title>` in `_EduCoreLayout.cshtml`).
+## Conventions
+- After any model change: `Add-Migration <Name>` + `Update-Database` in Package Manager Console.
+- Reference nav properties trigger spurious "required" validation (Nullable enabled) — use `ModelState.Remove(nameof(X.NavProp))` in POST actions.
+- Teacher controllers: `[Authorize(Roles="Teacher")]`; student controllers: `[Authorize(Roles="Student")]`; `User.GetUserId()` for the current user.
+- Views use `_EduCoreLayout` + `wwwroot/css/shared.css`.
