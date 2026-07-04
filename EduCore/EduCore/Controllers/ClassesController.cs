@@ -38,13 +38,13 @@ namespace EduCore.Controllers
         public async Task<IActionResult> Create(int? courseId)
         {
             await PopulateCoursesDropDown(courseId);
-            return View(new Class { CourseID = courseId ?? 0 });
+            return View(new Class { CourseID = courseId ?? 0, Enrollable = true });
         }
 
         // POST: /Classes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Price,PDF,HomeworkPDF,CourseID")] Class @class)
+        public async Task<IActionResult> Create([Bind("Name,Price,Enrollable,PDF,HomeworkPDF,CourseID")] Class @class)
         {
             // Navigation property isn't posted; don't let it fail validation.
             ModelState.Remove(nameof(Class.Course));
@@ -85,7 +85,7 @@ namespace EduCore.Controllers
         // POST: /Classes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Price,PDF,HomeworkPDF,CourseID")] Class @class)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Price,Enrollable,PDF,HomeworkPDF,CourseID")] Class @class)
         {
             if (id != @class.ID)
                 return NotFound();

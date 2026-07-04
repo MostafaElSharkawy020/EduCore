@@ -1,0 +1,84 @@
+@model IEnumerable<EduCore.Models.Card>
+@{
+    ViewData["Title"] = "Payment Cards";
+    var payments = ViewBag.Payments as List<EduCore.Models.Payment> ?? new();
+}
+
+<div class="page-header flex-between">
+    <div>
+        <h1 class="page-title">Payment Cards</h1>
+        <p class="page-subtitle">Manage your saved cards and view purchase history</p>
+    </div>
+    <a asp-action="Create" class="btn btn-accent">+ Add Card</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You have no saved cards. <a asp-action="Create" style="color:var(--accent2)">Add one</a> to enroll in paid courses.
+    </div>
+}
+else
+{
+    <div class="grid-3" style="margin-bottom:32px">
+        @foreach (var card in Model)
+        {
+            var last4 = card.CardNumber.Length >= 4 ? card.CardNumber[^4..] : card.CardNumber;
+            <div class="card" style="background:linear-gradient(135deg,var(--primary),#4f6ef7);color:#fff">
+                <div style="width:34px;height:24px;background:var(--accent);border-radius:5px;margin-bottom:16px"></div>
+                <div style="letter-spacing:3px;font-size:1.05rem;margin-bottom:16px">•••• •••• •••• @last4</div>
+                <div style="display:flex;justify-content:space-between;font-size:.82rem;opacity:.85">
+                    <span>@card.CardholderName</span>
+                    <span>exp @card.ExpiryDate.ToString("MM/yy")</span>
+                </div>
+                <form asp-action="Delete" method="post" style="margin-top:16px">
+                    <input type="hidden" name="id" value="@card.ID" />
+                    <button type="submit" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff">Remove</button>
+                </form>
+            </div>
+        }
+    </div>
+}
+
+<h2 style="font-size:1.25rem;margin-bottom:16px">Purchase History</h2>
+@if (!payments.Any())
+{
+    <div class="alert alert-info">No purchases yet.</div>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Card</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in payments)
+                {
+                    <tr>
+                        <td style="font-weight:600">@p.ItemName</td>
+                        <td>
+                            @if (p.ItemType == "Class")
+                            {
+                                <span class="badge badge-blue">Class</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-accent">Course</span>
+                            }
+                        </td>
+                        <td style="font-weight:600">@p.Amount.ToString("C")</td>
+                        <td>•••• @p.CardLast4</td>
+                        <td>@p.PaidAt.ToString("dd MMM yyyy, HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,82 @@
+@model IEnumerable<EduCore.Models.Payment>
+@{
+    ViewData["Title"] = "Revenue";
+    var gross = (decimal)(ViewBag.Gross ?? 0m);
+    var fee = (decimal)(ViewBag.Fee ?? 0m);
+    var net = (decimal)(ViewBag.Net ?? 0m);
+    var salesCount = (int)(ViewBag.SalesCount ?? 0);
+}
+
+<div class="page-header">
+    <h1 class="page-title">Revenue</h1>
+    <p class="page-subtitle">
+        Earnings from your course &amp; class sales · you keep @EduCore.Helpers.PlatformSettings.TeacherPercent%,
+        the platform takes @EduCore.Helpers.PlatformSettings.PlatformPercent%.
+    </p>
+</div>
+
+<div class="grid-4" style="margin-bottom:28px">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#eff3ff">🧾</div>
+        <div class="stat-value">@salesCount</div>
+        <div class="stat-label">Sales</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4">💰</div>
+        <div class="stat-value">@gross.ToString("C0")</div>
+        <div class="stat-label">Gross Revenue</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff0f0">🏛️</div>
+        <div class="stat-value">@fee.ToString("C0")</div>
+        <div class="stat-label">Platform Fee (@EduCore.Helpers.PlatformSettings.PlatformPercent%)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fef3e2">🤑</div>
+        <div class="stat-value">@net.ToString("C0")</div>
+        <div class="stat-label">Your Earnings (@EduCore.Helpers.PlatformSettings.TeacherPercent%)</div>
+    </div>
+</div>
+
+<h2 style="font-size:1.25rem;margin-bottom:16px">Sales History</h2>
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No sales yet. Earnings appear here when students buy your courses or classes.</div>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Your Share</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td style="font-weight:600">@p.ItemName</td>
+                        <td>
+                            @if (p.ItemType == "Class")
+                            {
+                                <span class="badge badge-blue">Class</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-accent">Course</span>
+                            }
+                        </td>
+                        <td>@p.Amount.ToString("C")</td>
+                        <td style="font-weight:600;color:#22c55e">@((p.Amount * EduCore.Helpers.PlatformSettings.TeacherShareRate).ToString("C"))</td>
+                        <td>@p.PaidAt.ToString("dd MMM yyyy, HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

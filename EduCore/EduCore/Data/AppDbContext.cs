@@ -27,6 +27,8 @@ namespace EduCore.Data
         public DbSet<StudentCourse> StudentCourses { get; set; }
         public DbSet<QuizAttempt> QuizAttempts { get; set; }
         public DbSet<ExamAttempt> ExamAttempts { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<StudentClass> StudentClasses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -82,6 +84,20 @@ namespace EduCore.Data
             modelBuilder.Entity<ExamAttempt>()
                 .HasOne(a => a.Student).WithMany()
                 .HasForeignKey(a => a.StudentID).OnDelete(DeleteBehavior.Restrict);
+
+            // ── Payments: money precision; only FK is Student (item is a snapshot) ──
+            modelBuilder.Entity<Payment>().Property(p => p.Amount).HasPrecision(18, 2);
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Student).WithMany()
+                .HasForeignKey(p => p.StudentID).OnDelete(DeleteBehavior.Restrict);
+
+            // ── Class enrollment (à la carte): two FKs, Student side restricted ──
+            modelBuilder.Entity<StudentClass>()
+                .HasOne(sc => sc.Class).WithMany(c => c.StudentClasses)
+                .HasForeignKey(sc => sc.ClassID).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<StudentClass>()
+                .HasOne(sc => sc.Student).WithMany()
+                .HasForeignKey(sc => sc.StudentID).OnDelete(DeleteBehavior.Restrict);
 
             // ── Unique email per account type (length-capped so the column can be indexed) ──
             modelBuilder.Entity<Teacher>().Property(t => t.Email).HasMaxLength(256);

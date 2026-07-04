@@ -25,6 +25,12 @@
             <input class="form-input" asp-for="Title" />
             <span asp-validation-for="Title" style="color:#ef4444;font-size:.8rem"></span>
         </div>
+        <div class="form-group">
+            <label class="form-label" asp-for="DurationMinutes">Time Limit (minutes)</label>
+            <input class="form-input" asp-for="DurationMinutes" type="number" min="0" max="600" />
+            <span asp-validation-for="DurationMinutes" style="color:#ef4444;font-size:.8rem"></span>
+            <div class="form-hint">Students must finish within this time. Set to 0 for no limit.</div>
+        </div>
         <div style="display:flex;gap:12px;justify-content:flex-end">
             <a asp-action="Index" asp-route-classId="@cls.ID" class="btn btn-outline">Cancel</a>
             <button type="submit" class="btn btn-accent">Save Changes</button>

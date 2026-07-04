@@ -15,13 +15,22 @@
     <p class="page-subtitle">@Model.Questions.Count question@(Model.Questions.Count == 1 ? "" : "s") · Choose one answer per question</p>
 </div>
 
+@if (Model.DurationMinutes > 0)
+{
+    <div id="timer-bar" style="position:sticky;top:calc(var(--nav-h) + 8px);z-index:50;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+        <span style="font-size:.85rem;color:var(--text-muted)">Time remaining</span>
+        <span id="timer" style="font-weight:700;font-family:'Playfair Display',serif;font-size:1.1rem;margin-left:auto">@Model.DurationMinutes:00</span>
+    </div>
+}
+
 @if (!Model.Questions.Any())
 {
     <div class="alert alert-info">This @label.ToLower() has no questions yet.</div>
 }
 else
 {
-    <form method="post" asp-action="@(Model.IsExam ? "SubmitExam" : "SubmitQuiz")">
+    <form id="assessmentForm" method="post" asp-action="@(Model.IsExam ? "SubmitExam" : "SubmitQuiz")">
         <input type="hidden" name="@(Model.IsExam ? "examId" : "quizId")" value="@Model.AssessmentId" />
 
         @for (int i = 0; i < Model.Questions.Count; i++)
@@ -58,4 +67,37 @@ else
             });
         });
     </script>
+
+    @if (Model.DurationMinutes > 0)
+    {
+        <script>
+            (function () {
+                var total = @(Model.DurationMinutes * 60);   // seconds
+                var el = document.getElementById('timer');
+                var bar = document.getElementById('timer-bar');
+                var form = document.getElementById('assessmentForm');
+                var submitted = false;
+
+                function fmt(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+
+                function tick() {
+                    if (total <= 0) {
+                        el.textContent = '0:00';
+                        if (!submitted) { submitted = true; form.submit(); }   // auto-submit when time is up
+                        return;
+                    }
+                    el.textContent = fmt(total);
+                    if (total <= 30) {            // last 30s: turn red
+                        el.style.color = '#ef4444';
+                        if (bar) { bar.style.borderColor = '#ef4444'; bar.style.background = '#fef2f2'; }
+                    }
+                    total--;
+                    setTimeout(tick, 1000);
+                }
+
+                form.addEventListener('submit', function () { submitted = true; });
+                tick();
+            })();
+        </script>
+    }
 }

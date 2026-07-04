@@ -11,6 +11,10 @@ namespace EduCore.Models
         [Display(Name = "Quiz Title")]
         public string Title { get; set; }
 
+        [Range(0, 600, ErrorMessage = "Time limit must be between 0 and 600 minutes (0 = no limit).")]
+        [Display(Name = "Time Limit (minutes)")]
+        public int DurationMinutes { get; set; }
+
         [Display(Name = "Class")]
         public int ClassID { get; set; }
 

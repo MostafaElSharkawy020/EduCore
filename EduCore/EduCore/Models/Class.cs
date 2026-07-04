@@ -16,6 +16,9 @@ namespace EduCore.Models
         [Display(Name = "Class Price")]
         public decimal Price { get; set; }
 
+        [Display(Name = "Open for enrollment")]
+        public bool Enrollable { get; set; }
+
         [Display(Name = "Lecture Notes PDF (URL or path)")]
         public string? PDF { get; set; }
 
@@ -30,5 +33,6 @@ namespace EduCore.Models
         public Course Course { get; set; }
         public List<Video> Videos { get; set; } = new();
         public List<Quiz> Quizzes { get; set; } = new();
+        public List<StudentClass> StudentClasses { get; set; } = new();
     }
 }

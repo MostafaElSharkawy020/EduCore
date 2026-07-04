@@ -43,6 +43,7 @@ else
                         <td>
                             <div class="flex gap-8">
                                 <a asp-action="Details" asp-route-id="@quiz.ID" class="btn btn-blue btn-sm">Manage Questions</a>
+                                <a asp-controller="Results" asp-action="Quiz" asp-route-id="@quiz.ID" class="btn btn-outline btn-sm">Results</a>
                                 <a asp-action="Edit" asp-route-id="@quiz.ID" class="btn btn-outline btn-sm">Edit</a>
                                 <a asp-action="Delete" asp-route-id="@quiz.ID" class="btn btn-danger btn-sm">Del</a>
                             </div>

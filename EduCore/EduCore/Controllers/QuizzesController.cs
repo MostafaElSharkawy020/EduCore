@@ -66,13 +66,13 @@ namespace EduCore.Controllers
                 return NotFound();
 
             ViewBag.Class = await _context.Classes.FindAsync(classId);
-            return View(new Quiz { ClassID = classId.Value });
+            return View(new Quiz { ClassID = classId.Value, DurationMinutes = 10 });
         }
 
         // POST: /Quizzes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,ClassID")] Quiz quiz)
+        public async Task<IActionResult> Create([Bind("Title,ClassID,DurationMinutes")] Quiz quiz)
         {
             ModelState.Remove(nameof(Quiz.Class));
 
@@ -110,7 +110,7 @@ namespace EduCore.Controllers
         // POST: /Quizzes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,ClassID")] Quiz quiz)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,ClassID,DurationMinutes")] Quiz quiz)
         {
             if (id != quiz.ID)
                 return NotFound();

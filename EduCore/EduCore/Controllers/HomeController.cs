@@ -8,7 +8,16 @@ namespace EduCore.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            // The app opens on the login page. Signed-in users go to their home instead.
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("Teacher"))
+                    return RedirectToAction("Index", "Dashboard");
+                if (User.IsInRole("Student"))
+                    return RedirectToAction("Index", "Learn");
+            }
+
+            return RedirectToAction("Login", "Account");
         }
 
         public IActionResult Privacy()

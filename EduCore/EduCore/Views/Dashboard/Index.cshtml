@@ -1,0 +1,125 @@
+@model EduCore.ViewModels.TeacherDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var fullName = User.Identity?.Name ?? "";
+    var firstName = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "there";
+}
+
+<style>
+    .welcome-banner { background:linear-gradient(135deg, var(--primary) 0%, #2d3566 100%); border-radius:16px; padding:32px 36px; color:#fff; margin-bottom:28px; }
+    .welcome-banner h1 { font-size:1.8rem; color:#fff; }
+</style>
+
+<div class="welcome-banner">
+    <div class="topnav-role" style="color:rgba(255,255,255,.5);margin-bottom:8px">DASHBOARD</div>
+    <h1>Welcome back, @firstName 👋</h1>
+    <p style="color:rgba(255,255,255,.65);margin-top:6px">Manage your courses and track how your students are doing.</p>
+</div>
+
+<div class="grid-4" style="margin-bottom:28px">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#eff3ff">📚</div>
+        <div class="stat-value">@Model.CourseCount</div>
+        <div class="stat-label">Courses</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fef3e2">👥</div>
+        <div class="stat-value">@Model.StudentCount</div>
+        <div class="stat-label">Total Students</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4">📹</div>
+        <div class="stat-value">@Model.ClassCount</div>
+        <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fff0f0">📝</div>
+        <div class="stat-value">@Model.AssessmentCount</div>
+        <div class="stat-label">Quizzes &amp; Exams</div>
+    </div>
+</div>
+
+<div class="flex-between mb-16">
+    <h2 style="font-size:1.25rem">My Courses</h2>
+    <a asp-controller="Courses" asp-action="Create" class="btn btn-accent btn-sm">+ New Course</a>
+</div>
+
+@if (!Model.Courses.Any())
+{
+    <div class="alert alert-info">
+        You have no courses yet.
+        <a asp-controller="Courses" asp-action="Create" style="color:var(--accent2)">Create your first course</a>.
+    </div>
+}
+else
+{
+    <div class="grid-3" style="margin-bottom:32px">
+        @foreach (var course in Model.Courses)
+        {
+            <a asp-controller="Courses" asp-action="Index" class="course-card">
+                <div class="course-card-img">
+                    <svg width="48" height="48" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
+                    <div style="position:absolute;top:12px;right:12px">
+                        @if (course.Enrollable)
+                        {
+                            <span class="badge badge-green">Open</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-accent">Closed</span>
+                        }
+                    </div>
+                </div>
+                <div class="course-card-body">
+                    <div class="course-card-title">@course.Name</div>
+                    <div style="margin-top:8px;font-size:.82rem;color:var(--text-muted)">
+                        @course.StudentCourses.Count students · @course.Classes.Count classes
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+}
+
+<h2 style="font-size:1.25rem;margin-bottom:16px">Recent Student Activity</h2>
+@if (!Model.RecentActivity.Any())
+{
+    <div class="alert alert-info">No quiz or exam attempts from your students yet.</div>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Assessment</th>
+                    <th>Type</th>
+                    <th>Score</th>
+                    <th>When</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model.RecentActivity)
+                {
+                    <tr>
+                        <td style="font-weight:600">@a.StudentName</td>
+                        <td>@a.AssessmentTitle</td>
+                        <td>
+                            @if (a.Type == "Exam")
+                            {
+                                <span class="badge badge-accent">Exam</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-blue">Quiz</span>
+                            }
+                        </td>
+                        <td style="font-weight:600">@a.Score / @a.Total</td>
+                        <td>@a.SubmittedAt.ToString("dd MMM yyyy, HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

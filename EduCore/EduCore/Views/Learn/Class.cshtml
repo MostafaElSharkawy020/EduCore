@@ -106,7 +106,9 @@
                     <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
                         <div style="flex:1">
                             <div style="font-weight:600;font-size:.9rem">@quiz.Title</div>
-                            <div style="font-size:.78rem;color:var(--text-muted)">@quiz.QuizQuestions.Count question@(quiz.QuizQuestions.Count == 1 ? "" : "s")</div>
+                            <div style="font-size:.78rem;color:var(--text-muted)">
+                                @quiz.QuizQuestions.Count question@(quiz.QuizQuestions.Count == 1 ? "" : "s")@(quiz.DurationMinutes > 0 ? $" · {quiz.DurationMinutes} min" : "")
+                            </div>
                         </div>
                         @if (hasAttempt)
                         {

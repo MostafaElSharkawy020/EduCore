@@ -31,7 +31,7 @@ namespace EduCore.Controllers
                 return RedirectToAction("Details", "Catalog", new { id = quiz.Class.CourseID });
 
             var questions = quiz.QuizQuestions.Select(qq => qq.Question);
-            return View("Take", BuildTake(quiz.Title, isExam: false, quiz.ID, quiz.ClassID, questions));
+            return View("Take", BuildTake(quiz.Title, isExam: false, quiz.ID, quiz.ClassID, quiz.DurationMinutes, questions));
         }
 
         // POST: /Assessments/SubmitQuiz
@@ -71,7 +71,7 @@ namespace EduCore.Controllers
                 return RedirectToAction("Details", "Catalog", new { id = exam.CourseID });
 
             var questions = exam.ExamQuestions.Select(eq => eq.Question);
-            return View("Take", BuildTake(exam.Title, isExam: true, exam.ID, exam.CourseID, questions));
+            return View("Take", BuildTake(exam.Title, isExam: true, exam.ID, exam.CourseID, exam.DurationMinutes, questions));
         }
 
         // POST: /Assessments/SubmitExam
@@ -117,9 +117,9 @@ namespace EduCore.Controllers
         private async Task<bool> IsEnrolled(int courseId) =>
             await _context.StudentCourses.AnyAsync(sc => sc.StudentID == CurrentStudentId && sc.CourseID == courseId);
 
-        private static TakeAssessmentViewModel BuildTake(string title, bool isExam, int id, int backId, IEnumerable<Question> questions)
+        private static TakeAssessmentViewModel BuildTake(string title, bool isExam, int id, int backId, int durationMinutes, IEnumerable<Question> questions)
         {
-            var vm = new TakeAssessmentViewModel { Title = title, IsExam = isExam, AssessmentId = id, BackId = backId };
+            var vm = new TakeAssessmentViewModel { Title = title, IsExam = isExam, AssessmentId = id, BackId = backId, DurationMinutes = durationMinutes };
             foreach (var q in questions)
             {
                 vm.Questions.Add(new TakeQuestion

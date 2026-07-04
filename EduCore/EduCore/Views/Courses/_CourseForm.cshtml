@@ -68,6 +68,16 @@
                         <div class="form-hint">Toggle to open or close enrollment</div>
                     </div>
                 </div>
+                <div class="form-group" style="margin-top:8px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <label class="toggle-switch">
+                            <input asp-for="AllowCourseEnrollment" />
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span style="font-size:.9rem;font-weight:500">Allow buying the whole course</span>
+                    </div>
+                    <div class="form-hint">Turn off to make this course <strong>class-only</strong> — students can enroll in individual classes but not the whole course.</div>
+                </div>
             </div>
 
             <div style="display:flex;gap:12px;justify-content:flex-end;padding-bottom:16px">

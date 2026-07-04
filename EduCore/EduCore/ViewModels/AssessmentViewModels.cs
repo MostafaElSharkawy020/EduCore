@@ -7,6 +7,7 @@ namespace EduCore.ViewModels
         public bool IsExam { get; set; }
         public int AssessmentId { get; set; }   // quiz id or exam id
         public int BackId { get; set; }          // class id (quiz) or course id (exam)
+        public int DurationMinutes { get; set; } // 0 = no time limit
         public List<TakeQuestion> Questions { get; set; } = new();
     }
 

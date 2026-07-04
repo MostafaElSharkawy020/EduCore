@@ -171,7 +171,7 @@ namespace EduCore.Controllers
                 return Redirect(returnUrl);
 
             return role == "Teacher"
-                ? RedirectToAction("Index", "Courses")
+                ? RedirectToAction("Index", "Dashboard")
                 : RedirectToAction("Index", "Learn");
         }
     }

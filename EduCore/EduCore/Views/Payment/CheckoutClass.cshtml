@@ -1,0 +1,73 @@
+@model EduCore.Models.Class
+@{
+    ViewData["Title"] = "Checkout";
+    var cards = ViewBag.Cards as List<EduCore.Models.Card> ?? new();
+    var course = Model.Course;
+}
+
+<style>
+    .checkout-cols { display:grid; grid-template-columns:1fr 300px; gap:24px; align-items:start; }
+    @@media(max-width:900px){ .checkout-cols { grid-template-columns:1fr; } }
+    .summary-card { background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:24px; position:sticky; top:calc(var(--nav-h) + 20px); box-shadow:var(--shadow); }
+</style>
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.CourseID" style="color:var(--accent2);text-decoration:none">@(course?.Name ?? "Course")</a>
+        <span style="margin:0 8px">›</span>
+        <span>Checkout</span>
+    </nav>
+    <h1 class="page-title">Checkout</h1>
+</div>
+
+<div class="checkout-cols">
+    <div>
+        @if (!cards.Any())
+        {
+            <div class="alert alert-warning">
+                You have no saved payment cards.
+                <a asp-controller="Cards" asp-action="Create" style="color:var(--accent2)">Add a card</a> to complete your purchase.
+            </div>
+        }
+        else
+        {
+            <form method="post" asp-action="PayClass">
+                <input type="hidden" name="classId" value="@Model.ID" />
+
+                <div class="card">
+                    <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px">Select a payment card</h3>
+                    @for (int i = 0; i < cards.Count; i++)
+                    {
+                        var card = cards[i];
+                        var last4 = card.CardNumber.Length >= 4 ? card.CardNumber[^4..] : card.CardNumber;
+                        <label class="choice-item" style="cursor:pointer">
+                            <input type="radio" name="cardId" value="@card.ID" required @(i == 0 ? "checked" : "") style="margin-right:8px" />
+                            <span>•••• •••• •••• @last4 — @card.CardholderName (exp @card.ExpiryDate.ToString("MM/yy"))</span>
+                        </label>
+                    }
+
+                    <div class="alert alert-info" style="font-size:.82rem;margin-top:14px">💳 Simulated payment — no real charge is made.</div>
+
+                    <div style="display:flex;gap:12px;margin-top:8px">
+                        <button type="submit" class="btn btn-accent">Pay @Model.Price.ToString("C")</button>
+                        <a asp-controller="Cards" asp-action="Create" class="btn btn-outline">+ New Card</a>
+                    </div>
+                </div>
+            </form>
+        }
+    </div>
+
+    <div>
+        <div class="summary-card">
+            <div style="font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px">Order Summary</div>
+            <div style="font-weight:700;margin-bottom:2px">@Model.Name</div>
+            <div style="font-size:.82rem;color:var(--text-muted)">Single class @(course != null ? $"· {course.Name}" : "")</div>
+            <hr class="divider">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <span class="text-muted">Total</span>
+                <span style="font-size:1.4rem;font-weight:700;color:var(--primary)">@Model.Price.ToString("C")</span>
+            </div>
+            <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px">One-time payment · Lifetime access to this class</div>
+        </div>
+    </div>
+</div>

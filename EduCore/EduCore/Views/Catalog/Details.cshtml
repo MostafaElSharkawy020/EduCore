@@ -8,6 +8,7 @@
         $"{(string.IsNullOrEmpty(a) ? "" : a[0].ToString())}{(string.IsNullOrEmpty(b) ? "" : b[0].ToString())}".ToUpper();
     var initials = teacher == null ? "T" : Init(teacher.FName, teacher.LName);
     var classes = Model.Classes.OrderBy(c => c.ID).ToList();
+    var ownedClassIds = ViewBag.OwnedClassIds as List<int> ?? new List<int>();
 }
 
 <style>
@@ -73,19 +74,32 @@
             {
                 @for (int i = 0; i < classes.Count; i++)
                 {
+                    var cls = classes[i];
+                    var owned = isEnrolled || ownedClassIds.Contains(cls.ID);
                     <div class="class-item">
                         <div class="class-num">@(i + 1)</div>
                         <div style="flex:1">
-                            <div style="font-weight:500;font-size:.9rem">@classes[i].Name</div>
+                            <div style="font-weight:500;font-size:.9rem">@cls.Name</div>
                             <div style="font-size:.78rem;color:var(--text-muted)">Video · PDF · Quiz</div>
                         </div>
-                        @if (isEnrolled)
+                        @if (owned)
                         {
-                            <span style="font-size:.78rem;color:#22c55e;font-weight:600">Included</span>
+                            <a asp-controller="Learn" asp-action="Class" asp-route-id="@cls.ID" class="btn btn-blue btn-sm">Open</a>
+                        }
+                        else if (cls.Enrollable && cls.Price > 0)
+                        {
+                            <a asp-controller="Payment" asp-action="CheckoutClass" asp-route-classId="@cls.ID" class="btn btn-outline btn-sm">Enroll — @cls.Price.ToString("C")</a>
+                        }
+                        else if (cls.Enrollable)
+                        {
+                            <form method="post" asp-action="EnrollClass" style="margin:0">
+                                <input type="hidden" name="classId" value="@cls.ID" />
+                                <button type="submit" class="btn btn-outline btn-sm">Enroll (Free)</button>
+                            </form>
                         }
                         else
                         {
-                            <span style="font-size:.75rem;color:var(--text-muted)">🔒 Enroll to unlock</span>
+                            <span style="font-size:.75rem;color:var(--text-muted)">🔒 Enroll in the course</span>
                         }
                     </div>
                 }
@@ -124,6 +138,14 @@
             {
                 <div class="alert alert-success" style="text-align:center;margin-bottom:12px">✓ You're enrolled</div>
                 <a asp-controller="Learn" asp-action="Course" asp-route-id="@Model.ID" class="btn btn-primary btn-full" style="padding:13px;font-size:1rem">Go to Course →</a>
+            }
+            else if (!Model.AllowCourseEnrollment)
+            {
+                <div class="alert alert-info" style="text-align:center">This course is available by individual class only. Pick a class below.</div>
+            }
+            else if (Model.Enrollable && Model.Price > 0)
+            {
+                <a asp-controller="Payment" asp-action="Checkout" asp-route-courseId="@Model.ID" class="btn btn-accent btn-full" style="padding:13px;font-size:1rem">Enroll — @Model.Price.ToString("C")</a>
             }
             else if (Model.Enrollable)
             {

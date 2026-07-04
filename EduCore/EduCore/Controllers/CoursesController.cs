@@ -40,7 +40,7 @@ namespace EduCore.Controllers
         // POST: /Courses/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Price,Enrollable")] Course course)
+        public async Task<IActionResult> Create([Bind("Name,Price,Enrollable,AllowCourseEnrollment")] Course course)
         {
             // The Teacher navigation property isn't posted by the form. With nullable
             // reference types enabled it is treated as required, which would make
@@ -76,7 +76,7 @@ namespace EduCore.Controllers
         // POST: /Courses/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Price,Enrollable")] Course course)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Price,Enrollable,AllowCourseEnrollment")] Course course)
         {
             if (id != course.ID)
                 return NotFound();

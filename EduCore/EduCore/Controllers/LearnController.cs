@@ -21,8 +21,10 @@ namespace EduCore.Controllers
         // GET: /Learn  — "My Courses" dashboard
         public async Task<IActionResult> Index()
         {
+            // Courses the student can access: full course enrollment OR owns at least one class in it.
             var courses = await _context.Courses
-                .Where(c => c.StudentCourses.Any(sc => sc.StudentID == CurrentStudentId))
+                .Where(c => c.StudentCourses.Any(sc => sc.StudentID == CurrentStudentId)
+                         || c.Classes.Any(cl => cl.StudentClasses.Any(scl => scl.StudentID == CurrentStudentId)))
                 .Include(c => c.Teacher)
                 .Include(c => c.Classes)
                 .OrderBy(c => c.Name)
@@ -37,7 +39,14 @@ namespace EduCore.Controllers
             if (id == null)
                 return NotFound();
 
-            if (!await IsEnrolled(id.Value))
+            var courseEnrolled = await IsEnrolled(id.Value);
+            var ownedClassIds = await _context.StudentClasses
+                .Where(sc => sc.StudentID == CurrentStudentId && sc.Class.CourseID == id)
+                .Select(sc => sc.ClassID)
+                .ToListAsync();
+
+            // Access requires course enrollment or owning at least one class in it.
+            if (!courseEnrolled && ownedClassIds.Count == 0)
                 return RedirectToAction("Details", "Catalog", new { id });
 
             var course = await _context.Courses
@@ -48,6 +57,9 @@ namespace EduCore.Controllers
 
             if (course == null)
                 return NotFound();
+
+            ViewBag.CourseEnrolled = courseEnrolled;
+            ViewBag.OwnedClassIds = ownedClassIds;
 
             var examIds = course.Exams.Select(e => e.ID).ToList();
             var examAttempts = await _context.ExamAttempts
@@ -75,7 +87,8 @@ namespace EduCore.Controllers
             if (cls == null)
                 return NotFound();
 
-            if (!await IsEnrolled(cls.CourseID))
+            // Access requires course enrollment OR owning this specific class.
+            if (!await HasClassAccess(cls.ID, cls.CourseID))
                 return RedirectToAction("Details", "Catalog", new { id = cls.CourseID });
 
             var quizIds = cls.Quizzes.Select(q => q.ID).ToList();
@@ -92,5 +105,9 @@ namespace EduCore.Controllers
         private async Task<bool> IsEnrolled(int courseId) =>
             await _context.StudentCourses
                 .AnyAsync(sc => sc.StudentID == CurrentStudentId && sc.CourseID == courseId);
+
+        private async Task<bool> HasClassAccess(int classId, int courseId) =>
+            await _context.StudentCourses.AnyAsync(sc => sc.StudentID == CurrentStudentId && sc.CourseID == courseId)
+            || await _context.StudentClasses.AnyAsync(sc => sc.StudentID == CurrentStudentId && sc.ClassID == classId);
     }
 }

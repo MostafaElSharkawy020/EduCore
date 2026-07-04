@@ -1,0 +1,74 @@
+@model EduCore.ViewModels.AssessmentResultsViewModel
+@{
+    ViewData["Title"] = Model.Title + " — Results";
+    var label = Model.IsExam ? "Exam" : "Quiz";
+    var backController = Model.IsExam ? "Exams" : "Quizzes";
+}
+
+<div class="page-header">
+    <nav style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">
+        <a asp-controller="@backController" asp-action="Details" asp-route-id="@Model.AssessmentId" style="color:var(--accent2);text-decoration:none">@Model.Title</a>
+        <span style="margin:0 8px">›</span>
+        <span>Results</span>
+    </nav>
+    <h1 class="page-title">Results</h1>
+    <p class="page-subtitle">@label · @Model.ParentName</p>
+</div>
+
+<div class="grid-4" style="margin-bottom:24px">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#eff3ff">📝</div>
+        <div class="stat-value">@Model.AttemptCount</div>
+        <div class="stat-label">Attempts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4">👥</div>
+        <div class="stat-value">@Model.StudentCount</div>
+        <div class="stat-label">Students</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#fef3e2">📊</div>
+        <div class="stat-value">@Model.AveragePercent.ToString("0")%</div>
+        <div class="stat-label">Average Score</div>
+    </div>
+</div>
+
+@if (!Model.Attempts.Any())
+{
+    <div class="alert alert-info">No one has taken this @label.ToLower() yet.</div>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Score</th>
+                    <th>%</th>
+                    <th>Submitted</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Attempts)
+                {
+                    <tr>
+                        <td>
+                            <div style="font-weight:600">@row.StudentName</div>
+                            <div style="font-size:.78rem;color:var(--text-muted)">@row.StudentEmail</div>
+                        </td>
+                        <td style="font-weight:600">@row.Score / @row.Total</td>
+                        <td>
+                            @{
+                                var pct = (int)Math.Round(row.Percent);
+                                var color = pct >= 50 ? "#22c55e" : "#ef4444";
+                            }
+                            <span style="font-weight:600;color:@color">@pct%</span>
+                        </td>
+                        <td>@row.SubmittedAt.ToString("dd MMM yyyy, HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

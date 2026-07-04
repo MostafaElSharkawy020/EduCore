@@ -14,6 +14,10 @@ namespace EduCore.Models
         [Display(Name = "Open for Enrollment")]
         public bool Enrollable { get; set; }
 
+        // When false, students can only enroll in individual classes, not the whole course.
+        [Display(Name = "Allow whole-course enrollment")]
+        public bool AllowCourseEnrollment { get; set; } = true;
+
         [Range(0, 100000, ErrorMessage = "Price must be between 0 and 100,000.")]
         [DataType(DataType.Currency)]
         [Display(Name = "Price (USD)")]

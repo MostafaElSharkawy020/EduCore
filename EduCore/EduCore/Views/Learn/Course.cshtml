@@ -5,6 +5,8 @@
     var teacherName = teacher == null ? "Instructor" : $"{teacher.FName} {teacher.LName}".Trim();
     var classes = Model.Classes.OrderBy(c => c.ID).ToList();
     var examScores = ViewBag.ExamScores as Dictionary<int, ExamAttempt>;
+    var courseEnrolled = (bool)(ViewBag.CourseEnrolled ?? true);
+    var ownedClassIds = ViewBag.OwnedClassIds as List<int> ?? new List<int>();
 }
 
 <style>
@@ -23,8 +25,13 @@
     <span>@Model.Name</span>
 </nav>
 
+@if (TempData["LearnMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["LearnMessage"]</div>
+}
+
 <div class="course-hero">
-    <span class="badge badge-green" style="margin-bottom:10px;display:inline-block">Enrolled</span>
+    <span class="badge badge-green" style="margin-bottom:10px;display:inline-block">@(courseEnrolled ? "Enrolled" : "Class access")</span>
     <h1>@Model.Name</h1>
     <div style="color:rgba(255,255,255,.7);font-size:.9rem">Instructor: @teacherName</div>
     <div class="course-meta-bar">
@@ -43,13 +50,33 @@
     {
         @for (int i = 0; i < classes.Count; i++)
         {
+            var cls = classes[i];
+            var canOpen = courseEnrolled || ownedClassIds.Contains(cls.ID);
             <div class="class-item">
                 <div class="class-num">@(i + 1)</div>
                 <div style="flex:1">
-                    <div style="font-weight:500;font-size:.9rem">@classes[i].Name</div>
+                    <div style="font-weight:500;font-size:.9rem">@cls.Name</div>
                     <div style="font-size:.78rem;color:var(--text-muted)">Video · PDF · Quiz</div>
                 </div>
-                <a asp-action="Class" asp-route-id="@classes[i].ID" class="btn btn-blue btn-sm">Open</a>
+                @if (canOpen)
+                {
+                    <a asp-action="Class" asp-route-id="@cls.ID" class="btn btn-blue btn-sm">Open</a>
+                }
+                else if (cls.Enrollable && cls.Price > 0)
+                {
+                    <a asp-controller="Payment" asp-action="CheckoutClass" asp-route-classId="@cls.ID" class="btn btn-outline btn-sm">Enroll — @cls.Price.ToString("C")</a>
+                }
+                else if (cls.Enrollable)
+                {
+                    <form method="post" asp-controller="Catalog" asp-action="EnrollClass" style="margin:0">
+                        <input type="hidden" name="classId" value="@cls.ID" />
+                        <button type="submit" class="btn btn-outline btn-sm">Enroll (Free)</button>
+                    </form>
+                }
+                else
+                {
+                    <span style="font-size:.75rem;color:var(--text-muted)">🔒 Locked</span>
+                }
             </div>
         }
     }
@@ -67,7 +94,13 @@
         {
             var hasAttempt = examScores != null && examScores.ContainsKey(exam.ID);
             <div class="class-item">
-                <div style="flex:1;font-weight:600">@exam.Title</div>
+                <div style="flex:1">
+                    <div style="font-weight:600">@exam.Title</div>
+                    @if (exam.DurationMinutes > 0)
+                    {
+                        <div style="font-size:.78rem;color:var(--text-muted)">@exam.DurationMinutes min time limit</div>
+                    }
+                </div>
                 @if (hasAttempt)
                 {
                     <span style="font-size:.78rem;color:var(--text-muted);margin-right:6px">Last: @examScores[exam.ID].Score/@examScores[exam.ID].TotalQuestions</span>

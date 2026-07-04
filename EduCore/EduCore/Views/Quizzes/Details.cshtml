@@ -14,7 +14,10 @@
         <h1 class="page-title">@Model.Title</h1>
         <p class="page-subtitle">@items.Count question@(items.Count == 1 ? "" : "s") · Class: @Model.Class.Name</p>
     </div>
-    <a asp-controller="Questions" asp-action="Create" asp-route-quizId="@Model.ID" class="btn btn-accent">+ Add Question</a>
+    <div style="display:flex;gap:10px">
+        <a asp-controller="Results" asp-action="Quiz" asp-route-id="@Model.ID" class="btn btn-outline">View Results</a>
+        <a asp-controller="Questions" asp-action="Create" asp-route-quizId="@Model.ID" class="btn btn-accent">+ Add Question</a>
+    </div>
 </div>
 
 @if (items.Count == 0)
