@@ -39,6 +39,25 @@ namespace EduCore
 
             var app = builder.Build();
 
+            // Apply any pending EF Core migrations at startup.
+            // Useful for hosts (e.g. MonsterASP) whose database is only reachable from the
+            // deployed app, not from a local machine running Update-Database.
+            using (var scope = app.Services.CreateScope())
+            {
+                try
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                    db.Database.Migrate();
+                }
+                catch (Exception ex)
+                {
+                    // Don't crash the app if migration fails (e.g. DB not reachable yet);
+                    // log and continue so the error is visible in the host logs.
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "Database migration on startup failed.");
+                }
+            }
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
